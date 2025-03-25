@@ -1,12 +1,19 @@
 import Header from "@/components/Header";
 import { articleData } from "@/components/ArticleData";
 import { notFound } from "next/navigation";
+export const dynamic = 'force-dynamic';
 
-export default function ArticlePage({ params }: { params: { slug: string } }) {
-  const article = articleData.find((a) => a.url === params.slug);
+interface PageParams {
+  params: Promise<{ slug: string }>;
+}
 
+
+export default async function ArticlePage({ params }: PageParams) {
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
+  const article = articleData.find((a) => a.url === slug);
   if (!article) return notFound();
-
+  
   const contentMap: Record<string, string> = {
     "what-is-sports-betting": `
 **What is Sports Betting?**
@@ -40,7 +47,7 @@ This method is common in football and basketball.
       <main className="max-w-3xl mx-auto px-6 py-10">
         <h1 className="text-4xl font-bold mb-6">{article.title}</h1>
         <img src={article.image} alt={article.title} className="w-full rounded-lg mb-6" />
-        <div className="text-lg leading-8 whitespace-pre-line">{contentMap[params.slug]}</div>
+        <div className="text-lg leading-8 whitespace-pre-line">{contentMap[slug]}</div>
       </main>
     </div>
   );

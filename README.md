@@ -1,1 +1,1 @@
-# ufc-betting
+Setup

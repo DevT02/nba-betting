@@ -1,18 +1,3 @@
-*.db
-*.venv
-*.sqlite
-*.env
-*.pkl
-*.json
-
-
-
-# Directories
-/venv
-/betting-website/node_modules
-/betting-website/.next
-/Model_Deployment/__pycache__
-**/__pycache__/
-/betting-website/.env.local
-/Model_Deployment/.env.local
-*.local
+/node_modules
+/.env.local
+/.next

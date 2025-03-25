@@ -9,9 +9,9 @@ import { addDays } from "date-fns";
 export default async function Home({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }> ;
 }) {
-  const sp = await Promise.resolve(searchParams);
+  const sp = await searchParams;
   const { tab } = sp;
   const activeTab = Array.isArray(tab) ? tab[0] || "Featured" : tab || "Featured";
   const { db } = await connectToDatabase();
@@ -101,7 +101,7 @@ export default async function Home({
                 const gameId = game._id.toString();
 
                 return (
-                  <Link key={gameId} href={`/gamedetails?id=${encodeURIComponent(gameId)}`}>
+                  <Link key={gameId} href={`/gamedetails/${gameId}`}>
                     <div className="bg-white rounded-lg p-5 shadow-md cursor-pointer">
                       <div className="flex items-center gap-2 text-gray-700 mb-4">
                         <Calendar className="h-5 w-5 text-gray-500" />

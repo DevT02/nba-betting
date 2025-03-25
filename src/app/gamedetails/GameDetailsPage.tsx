@@ -3,10 +3,7 @@ import { ObjectId } from "mongodb";
 import GameDetails from "@/components/GameDetails";
 import { connectToDatabase } from "@/lib/mongodb";
 import { getTeamLogo } from "@/lib/teamNameMap";
-
-interface GameDetailsPageProps {
-  id: string;
-}
+import { GameDetailsPageProps } from "@/types/gameDetails";
 
 export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
   if (!id) {

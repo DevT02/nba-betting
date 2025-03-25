@@ -2,13 +2,9 @@ import Header from "@/components/Header";
 import { articleData } from "@/components/ArticleData";
 import { notFound } from "next/navigation";
 export const dynamic = 'force-dynamic';
+import { ArticlePageParams } from "@/types/pageParams";
 
-interface PageParams {
-  params: Promise<{ slug: string }>;
-}
-
-
-export default async function ArticlePage({ params }: PageParams) {
+export default async function ArticlePage({ params }: ArticlePageParams) {
   const resolvedParams = await params;
   const slug = resolvedParams.slug;
   const article = articleData.find((a) => a.url === slug);

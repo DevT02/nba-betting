@@ -1,11 +1,7 @@
 import GameDetailsPage from "@/app/gamedetails/GameDetailsPage";
-
-interface PageParams {
-  params: Promise<{ id: string }>;
-}
+import { PageParams } from "@/types/pageParams";
 
 export default async function Page({ params }: PageParams) {
-  const resolvedParams = await params;
-  const id = resolvedParams.id;
+  const { id } = await params;
   return <GameDetailsPage id={id} />;
 }

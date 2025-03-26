@@ -1,3 +1,6 @@
+purely frontend for 
+https://www.iverson.bet
+
 ## 🛠️ Setup
 
 ```bash

@@ -4,6 +4,7 @@ import GameDetails from "@/components/GameDetails";
 import { connectToDatabase } from "@/lib/mongodb";
 import { getTeamLogo } from "@/lib/teamNameMap";
 import { GameDetailsPageProps } from "@/types/gameDetails";
+import { mergeArenaInfo } from "@/lib/mergeGameData";
 
 export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
   if (!id) {
@@ -16,8 +17,12 @@ export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
     return <p className="text-center text-gray-600">No game data available.</p>;
   }
 
-  const { home_team, away_team, commence_time } = baseGameRecord;
-  const gameRecords = await db.collection("ev_results").find({ home_team, away_team, commence_time }).toArray();
+  const mergedGameRecord = await mergeArenaInfo(baseGameRecord, db);
+  const { home_team, away_team, commence_time } = mergedGameRecord;
+  const gameRecords = await db.collection("ev_results")
+    .find({ home_team, away_team, commence_time })
+    .toArray();
+
   const bookmakers = gameRecords.map((record) => ({
     book: record.bookmaker,
     home_moneyline: record.home_odds.toString(),
@@ -50,7 +55,7 @@ export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
       minute: "2-digit",
       timeZoneName: "short",
     }),
-    arena: "Location not available",
+    arena: mergedGameRecord.arena,
     h2h_record: "H2H data not available",
     over_under: "Over/Under data not available",
     player_injury: "No injury updates",

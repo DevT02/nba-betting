@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import Link from "next/link";
 import { formatInTimeZone } from "date-fns-tz";
 import { addDays } from "date-fns";
+import { mergeArenaInfo } from "@/lib/mergeGameData"; 
 
 export default async function Home({
   searchParams,
@@ -17,7 +18,6 @@ export default async function Home({
   const { db } = await connectToDatabase();
   const timeZone = "America/New_York";
 
-  // "2025-03-26T00:00:00-04:00" is a fixed date for testing purposes. (can test with different dates)
   const now = new Date();
   const startTodayStr = formatInTimeZone(now, timeZone, "yyyy-MM-dd'T'00:00:00XXX");
   const endTodayStr = formatInTimeZone(now, timeZone, "yyyy-MM-dd'T'23:59:59XXX");
@@ -42,7 +42,6 @@ export default async function Home({
             }
           }
         },
-        // Group by game identity and compute the maximum positive EV from either side.
         {
           $group: {
             _id: {
@@ -154,6 +153,10 @@ export default async function Home({
       ])
       .toArray();
   }
+
+  games = await Promise.all(games.map(async (game) => {
+    return await mergeArenaInfo(game, db);
+  }));
 
   return (
     <div className="w-full min-h-screen flex flex-col bg-gray-100">

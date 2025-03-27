@@ -33,6 +33,9 @@
  * convertTeamName("NY Knicks")      "NYK"
  * getCanonicalTeamName("NY Knicks") "New York Knicks"
  * 
+ * short version of a name:
+ * getShortTeamName("Los Angeles Lakers") "Lakers"
+ * 
  * error handling:
  * convertTeamName("Some Unknown Team") 
  * Throws: "Could not convert team name or acronym: Some Unknown Team"
@@ -146,4 +149,21 @@ export function getCanonicalTeamName(name: string): string {
 export const getTeamLogo = (team: string): string => {
   const canonicalTeam = getCanonicalTeamName(team);
   return `/logos/${encodeURIComponent(canonicalTeam)}.svg`;
+}
+
+/**
+ * Returns the short version of a canonical team name
+ * Falls back to the original name if no alias is found.
+ *
+ * @param name - The full/canonical team name, acronym, or alias.
+ * @returns The short name like "Lakers", "Warriors", etc.
+ */
+export function getShortTeamName(name: string): string {
+  try {
+    const acronym = convertTeamName(name);
+    const aliases = teamAliases[acronym];
+    return aliases?.[aliases.length - 1] || name;
+  } catch {
+    return name; 
+  }
 }

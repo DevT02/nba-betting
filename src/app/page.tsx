@@ -38,8 +38,8 @@ export default async function Home({
           $match: {
             $expr: {
               $and: [
-                { $gte: [ { $toDate: "$commence_time" }, now ] },
-                { $lte: [ { $toDate: "$commence_time" }, new Date(endTodayStr) ] }
+                { $gte: [ "$commence_time", now ] },
+                { $lte: [ "$commence_time", new Date(endTodayStr) ] }
               ]
             }
           }
@@ -80,8 +80,8 @@ export default async function Home({
           $match: {
             $expr: {
               $and: [
-                { $gte: [ { $toDate: "$commence_time" }, new Date(startTodayStr) ] },
-                { $lte: [ { $toDate: "$commence_time" }, new Date(endTodayStr) ] }
+                { $gte: [ "$commence_time", new Date(startTodayStr) ] },
+                { $lte: [ "$commence_time", new Date(endTodayStr) ] }
               ]
             }
           }
@@ -107,8 +107,8 @@ export default async function Home({
           $match: {
             $expr: {
               $and: [
-                { $gte: [ { $toDate: "$commence_time" }, new Date(startTomorrowStr) ] },
-                { $lte: [ { $toDate: "$commence_time" }, new Date(endTomorrowStr) ] }
+                { $gte: [ "$commence_time", new Date(startTomorrowStr) ] },
+                { $lte: [ "$commence_time", new Date(endTomorrowStr) ] }
               ]
             }
           }
@@ -134,8 +134,8 @@ export default async function Home({
           $match: {
             $expr: {
               $and: [
-                { $gte: [ { $toDate: "$commence_time" }, now ] },
-                { $lte: [ { $toDate: "$commence_time" }, sevenDaysLater ] }
+                { $gte: [ "$commence_time", now ] },
+                { $lte: [ "$commence_time", sevenDaysLater ] }
               ]
             }
           }

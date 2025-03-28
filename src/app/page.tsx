@@ -7,6 +7,7 @@ import { formatInTimeZone } from "date-fns-tz";
 import { addDays } from "date-fns";
 import { mergeArenaInfo } from "@/lib/mergeGameData"; 
 import GamesGrid from "@/components/GamesGrid";
+import TimeZoneSync from '@/components/utils/TimeZoneSync';
 
 export default async function Home({
   searchParams,
@@ -14,11 +15,11 @@ export default async function Home({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const sp = await searchParams;
-  const { tab } = sp;
-  const activeTab = Array.isArray(tab) ? tab[0] || "Featured" : tab || "Featured";
+  const { tab, tz } = sp;
   const { db } = await connectToDatabase();
-  const timeZone = "America/New_York";
 
+  const activeTab = Array.isArray(tab) ? tab[0] || "Featured" : tab || "Featured";
+  const timeZone = Array.isArray(tz) ? tz[0] : tz || "America/New_York";
   const now = new Date();
   const startTodayStr = formatInTimeZone(now, timeZone, "yyyy-MM-dd'T'00:00:00XXX");
   const endTodayStr = formatInTimeZone(now, timeZone, "yyyy-MM-dd'T'23:59:59XXX");
@@ -162,6 +163,7 @@ export default async function Home({
 
   return (
     <div className="w-full min-h-screen flex flex-col bg-gray-100">
+      <TimeZoneSync />
       <Header />
       <div className="flex-1 w-full max-w-6xl mx-auto p-4 flex gap-6">
         <div className="flex-1">

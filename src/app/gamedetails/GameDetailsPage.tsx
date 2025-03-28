@@ -6,6 +6,7 @@ import { getTeamLogo } from "@/lib/teamNameMap";
 import { GameDetailsPageProps } from "@/types/gameDetails";
 import { mergeArenaInfo } from "@/lib/mergeGameData";
 
+
 export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
   if (!id) {
     return <p className="text-center text-gray-600">No game ID provided.</p>;
@@ -18,6 +19,8 @@ export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
   }
 
   const mergedGameRecord = await mergeArenaInfo(baseGameRecord, db);
+  mergedGameRecord._id = mergedGameRecord._id.toString(); // plain object ID for JSON serialization.. sucks i guess
+
   const { home_team, away_team, commence_time } = mergedGameRecord;
   const gameRecords = await db.collection("ev_results")
     .find({ home_team, away_team, commence_time })
@@ -50,11 +53,7 @@ export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
 
   const eventTime = new Date(commence_time);
   const gameDetails = {
-    game_time: eventTime.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZoneName: "short",
-    }),
+    game_time: eventTime.toISOString(),
     arena: mergedGameRecord.arena,
     h2h_record: "H2H data not available",
     over_under: "Over/Under data not available",

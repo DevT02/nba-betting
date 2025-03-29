@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`font-sans light`}>
+    <html lang="en" className="font-sans" suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{

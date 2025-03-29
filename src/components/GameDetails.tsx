@@ -75,60 +75,67 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails }: GameDetailsPro
             color: "hsl(var(--card-foreground))",
           }}
         >
-          <h1 className="font-bold text-center -mb-2">
-            <div className="flex items-center justify-center gap-2 sm:gap-4 flex-wrap">
-              <img
-                src={logoLeft}
-                alt={`${teamNames[0]} logo`}
-                className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex-shrink-0"
-              />
-              <span className="whitespace-nowrap text-[0.75rem] sm:text-xs md:text-xl">
-                {teamNames[0]} vs. {teamNames[1]}
-              </span>
-              <img
-                src={logoRight}
-                alt={`${teamNames[1]} logo`}
-                className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex-shrink-0"
-              />
-            </div>
-          </h1>
 
-          <div className="mb-4 space-y-2">
-            <div className="flex items-center justify-center gap-2 text-[0.65rem] sm:text-xs text-gray-600 dark:text-gray-300 mt-2">
-              <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
-                <ClockIcon className="h-3 w-3" />
-                <span>{formattedTime}</span>
+          {/* Title section */}
+          <div className="flex flex-col items-center gap-6 mb-8">
+            {/* Title section */}
+            <h1 className="font-bold text-center">
+              <div className="flex items-center justify-center gap-2 sm:gap-4 flex-nowrap">
+                <img
+                  src={logoLeft}
+                  alt={`${teamNames[0]} logo`}
+                  className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex-shrink-0"
+                />
+                <span className="whitespace-nowrap text-[0.75rem] sm:text-2xl md:text-3xl lg:text-4xl overflow-hidden overflow-ellipsis">
+                  {teamNames[0]} vs. {teamNames[1]}
+                </span>
+                <img
+                  src={logoRight}
+                  alt={`${teamNames[1]} logo`}
+                  className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex-shrink-0"
+                />
               </div>
-              <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
-                <MapPinIcon className="h-3 w-3" />
-                <span>{gameDetails.arena || "TBD"}</span>
+            </h1>
+
+            <div className="flex flex-wrap items-center justify-center gap-3 text-xs sm:text-sm">
+              <div className="flex items-center gap-2 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-full">
+                <ClockIcon className="h-4 w-4 text-red-500" />
+                <span className="font-medium">{formattedTime}</span>
+              </div>
+              <div className="flex items-center gap-2 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-full">
+                <MapPinIcon className="h-4 w-4 text-blue-500" />
+                <span className="font-medium">{gameDetails.arena || "TBD"}</span>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[0.65rem] sm:text-xs">
-              <div className="flex items-center gap-1">
-                <span className="font-medium text-purple-600">H2H:</span>
-                <span>{gameDetails.h2h_record}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <TrendingUpIcon className="h-3 w-3 text-green-600" />
-                <span>{gameDetails.over_under}</span>
-              </div>
-              {gameDetails.player_injury && (
-                <div className="flex items-center gap-1 text-red-600">
-                  <AlertTriangleIcon className="h-3 w-3" />
-                  <span>{gameDetails.player_injury}</span>
+            <div className="py-1 w-full">
+              <div className="border-t border-b border-gray-100 dark:border-gray-800/50 py-3 flex items-center justify-center gap-x-6 sm:gap-x-8 overflow-x-auto whitespace-nowrap px-4 text-xs sm:text-sm">
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <span className="font-medium text-purple-500 dark:text-purple-400">H2H:</span>
+                  <span>{gameDetails.h2h_record}</span>
                 </div>
-              )}
-            </div>
-          </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <TrendingUpIcon className="h-4 w-4 text-green-500 dark:text-green-400" />
+                  <span>{gameDetails.over_under}</span>
+                </div>
+                {gameDetails.player_injury && (
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <AlertTriangleIcon className="h-4 w-4 text-red-500 dark:text-red-400" />
+                    <span>{gameDetails.player_injury}</span>
+                  </div>
+                )}
+              </div>
 
-          <div className="flex font-inter items-center justify-center gap-2 text-[0.75rem] sm:text-xs md:text-lg text-gray-800 dark:text-gray-200 mb-4">
-            <FaTrophy className="text-yellow-500 h-3 w-3 sm:h-4 sm:w-4" />
-            <span className="font-bold">{bestTeam}</span>
-            <span className="text-[0.6rem] sm:text-xs md:text-base font-normal">
-              ({oddsData[bestTeam][0]?.probability ?? "N/A"} probability)
-            </span>
+            </div>
+
+            {/* Prediction with subtle highlight */}
+            <div className="flex items-center justify-center gap-2 text-sm sm:text-base md:text-lg border border-yellow-200 dark:border-yellow-900/50 px-4 py-2 rounded-lg">
+              <FaTrophy className="text-yellow-500 dark:text-yellow-400 h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="font-bold">{bestTeam}</span>
+              <span className="text-xs sm:text-sm md:text-base font-normal">
+                ({oddsData[bestTeam][0]?.probability ?? "N/A"} probability)
+              </span>
+            </div>
           </div>
 
           <Tabs defaultValue={teamNames[0]}>

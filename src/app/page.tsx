@@ -82,6 +82,8 @@ export default async function Home({
     // For upcoming, filter games from now until seven days later.
     games = evResults.filter((game) => {
       const gameTime = new Date(game.commence_time);
+      // gameTime > new Date(endTodayStr) && gameTime <= sevenDaysLater  if we want to include only games after today
+      // but for now to include all games within the next 7 days from now, we can use the following condition:
       return gameTime >= now && gameTime <= sevenDaysLater;
     });
   }

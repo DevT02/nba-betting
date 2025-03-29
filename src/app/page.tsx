@@ -6,7 +6,7 @@ import { formatInTimeZone } from "date-fns-tz";
 import { addDays } from "date-fns";
 
 import { mergeArenaInfo } from "@/lib/mergeGameData"; 
-import { getEvResults } from "@/lib/staticCache";
+import { getEvResults, getUpcomingGames } from "@/lib/staticCache";
 import { getTeamLogo } from "@/lib/teamNameMap";
 
 import GamesGrid from "@/components/GamesGrid";
@@ -43,6 +43,7 @@ export default async function Home({
   const startTomorrowStr = formatInTimeZone(tomorrow, timeZone, "yyyy-MM-dd'T'00:00:00XXX");
   const endTomorrowStr = formatInTimeZone(tomorrow, timeZone, "yyyy-MM-dd'T'23:59:59XXX");
   const sevenDaysLater = addDays(now, 7);
+  const upcomingGames = await getUpcomingGames();
 
   const evResults = await getEvResults();
   let games: any[] = [];
@@ -91,7 +92,7 @@ export default async function Home({
   games = deduplicateGames(games);
   games = await Promise.all(
     games.map(async (game) => {
-      return await mergeArenaInfo(game, { collection: () => ({ findOne: async () => null }) }); 
+      return await mergeArenaInfo(game, upcomingGames);
     })
   );
   games = JSON.parse(JSON.stringify(games)); // for json serialization

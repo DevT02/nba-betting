@@ -48,10 +48,24 @@ export default async function Home({
   let games: any[] = [];
 
   if (activeTab === "Featured") {
-    games = evResults
-      .filter((game) => {
-        const gameTime = new Date(game.commence_time);
-        return gameTime >= new Date(startTodayStr) && gameTime <= new Date(endTodayStr);
+    const groupedGames = new Map<string, any>();
+    for (const game of evResults) {
+      const gameTime = new Date(game.commence_time);
+      if (gameTime >= new Date(startTodayStr) && gameTime <= new Date(endTodayStr)) {
+        const key = `${game.home_team}-${game.away_team}-${game.commence_time}`;
+        const existing = groupedGames.get(key);
+        const maxProb = Math.max(game.home_win_prob, game.away_win_prob);
+  
+        if (!existing || maxProb > Math.max(existing.home_win_prob, existing.away_win_prob)) {
+          groupedGames.set(key, game);
+        }
+      }
+    }
+    games = Array.from(groupedGames.values())
+      .sort((a, b) => {
+        const maxA = Math.max(a.home_win_prob, a.away_win_prob);
+        const maxB = Math.max(b.home_win_prob, b.away_win_prob);
+        return maxB - maxA;
       })
       .slice(0, 4);
   } else if (activeTab === "Today") {
@@ -72,6 +86,7 @@ export default async function Home({
     });
   }
 
+  games = deduplicateGames(games);
   games = await Promise.all(
     games.map(async (game) => {
       return await mergeArenaInfo(game, { collection: () => ({ findOne: async () => null }) }); 

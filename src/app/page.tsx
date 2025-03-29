@@ -1,11 +1,14 @@
-import { Clock, MapPin, Calendar } from "lucide-react";
-import { connectToDatabase } from "@/lib/mongodb";
-import { getTeamLogo } from "@/lib/teamNameMap";
 import Header from "../components/Header";
 import Link from "next/link";
+
+import { Clock, MapPin, Calendar } from "lucide-react";
 import { formatInTimeZone } from "date-fns-tz";
 import { addDays } from "date-fns";
+
 import { mergeArenaInfo } from "@/lib/mergeGameData"; 
+import { getEvResults } from "@/lib/staticCache";
+import { getTeamLogo } from "@/lib/teamNameMap";
+
 import GamesGrid from "@/components/GamesGrid";
 import TimeZoneSync from '@/components/utils/TimeZoneSync';
 
@@ -16,7 +19,6 @@ export default async function Home({
 }) {
   const sp = await searchParams;
   const { tab, tz } = sp;
-  const { db } = await connectToDatabase();
 
   const activeTab = Array.isArray(tab) ? tab[0] || "Featured" : tab || "Featured";
   const timeZone = Array.isArray(tz) ? tz[0] : tz || "America/New_York";
@@ -28,129 +30,39 @@ export default async function Home({
   const endTomorrowStr = formatInTimeZone(tomorrow, timeZone, "yyyy-MM-dd'T'23:59:59XXX");
   const sevenDaysLater = addDays(now, 7);
 
+  const evResults = await getEvResults();
   let games: any[] = [];
 
   if (activeTab === "Featured") {
-    games = await db.collection("ev_results")
-      .aggregate([
-        {
-          $match: {
-            $expr: {
-              $and: [
-                { $gte: [ "$commence_time", new Date(startTodayStr) ] },
-                { $lte: [ "$commence_time", new Date(endTodayStr) ] }
-              ]
-            }
-          }
-        },
-        {
-          $group: {
-            _id: {
-              home_team: "$home_team",
-              away_team: "$away_team",
-              commence_time: "$commence_time",
-            },
-            doc: { $first: "$$ROOT" },
-            maxHomeProb: { $max: "$home_win_prob" },
-            maxAwayProb: { $max: "$away_win_prob" },
-          },
-        },
-        {
-          $addFields: {
-            maxProbability: { $max: ["$maxHomeProb", "$maxAwayProb"] }
-          },
-        },
-        { $sort: { maxProbability: -1 } },
-        { $limit: 4 },
-        { $replaceRoot: { newRoot: "$doc" } },
-      ])
-      .toArray();
-    } else if (activeTab === "Today") {
-      games = await db.collection("ev_results")
-      .aggregate([
-        {
-          $match: {
-            $expr: {
-              $and: [
-                { $gte: [ "$commence_time", new Date(startTodayStr) ] },
-                { $lte: [ "$commence_time", new Date(endTodayStr) ] }
-              ]
-            }
-          }
-        },
-        {
-          $group: {
-            _id: {
-              home_team: "$home_team",
-              away_team: "$away_team",
-              commence_time: "$commence_time",
-            },
-            doc: { $first: "$$ROOT" },
-          },
-        },
-        { $replaceRoot: { newRoot: "$doc" } },
-        { $sort: { commence_time: 1 } },
-      ])
-      .toArray();
+    games = evResults
+      .filter((game) => {
+        const gameTime = new Date(game.commence_time);
+        return gameTime >= new Date(startTodayStr) && gameTime <= new Date(endTodayStr);
+      })
+      .slice(0, 4);
+  } else if (activeTab === "Today") {
+    games = evResults.filter((game) => {
+      const gameTime = new Date(game.commence_time);
+      return gameTime >= new Date(startTodayStr) && gameTime <= new Date(endTodayStr);
+    });
   } else if (activeTab === "Tomorrow") {
-    games = await db.collection("ev_results")
-      .aggregate([
-        {
-          $match: {
-            $expr: {
-              $and: [
-                { $gte: [ "$commence_time", new Date(startTomorrowStr) ] },
-                { $lte: [ "$commence_time", new Date(endTomorrowStr) ] }
-              ]
-            }
-          }
-        },
-        {
-          $group: {
-            _id: {
-              home_team: "$home_team",
-              away_team: "$away_team",
-              commence_time: "$commence_time",
-            },
-            doc: { $first: "$$ROOT" },
-          },
-        },
-        { $replaceRoot: { newRoot: "$doc" } },
-        { $sort: { commence_time: 1 } },
-      ])
-      .toArray();
+    games = evResults.filter((game) => {
+      const gameTime = new Date(game.commence_time);
+      return gameTime >= new Date(startTomorrowStr) && gameTime <= new Date(endTomorrowStr);
+    });
   } else if (activeTab === "Upcoming") {
-    games = await db.collection("ev_results")
-      .aggregate([
-        {
-          $match: {
-            $expr: {
-              $and: [
-                { $gte: [ "$commence_time", now ] },
-                { $lte: [ "$commence_time", sevenDaysLater ] }
-              ]
-            }
-          }
-        },
-        {
-          $group: {
-            _id: {
-              home_team: "$home_team",
-              away_team: "$away_team",
-              commence_time: "$commence_time",
-            },
-            doc: { $first: "$$ROOT" },
-          },
-        },
-        { $replaceRoot: { newRoot: "$doc" } },
-        { $sort: { commence_time: 1 } },
-      ])
-      .toArray();
+    // For upcoming, filter games from now until seven days later.
+    games = evResults.filter((game) => {
+      const gameTime = new Date(game.commence_time);
+      return gameTime >= now && gameTime <= sevenDaysLater;
+    });
   }
 
-  games = await Promise.all(games.map(async (game) => {
-    return await mergeArenaInfo(game, db);
-  }));
+  games = await Promise.all(
+    games.map(async (game) => {
+      return await mergeArenaInfo(game, { collection: () => ({ findOne: async () => null }) }); 
+    })
+  );
   games = JSON.parse(JSON.stringify(games)); // for json serialization
 
   return (

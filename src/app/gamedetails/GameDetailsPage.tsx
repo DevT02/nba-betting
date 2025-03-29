@@ -1,12 +1,13 @@
 import React from "react";
 import { ObjectId } from "mongodb";
-import GameDetails from "@/components/GameDetails";
+import GameDetails from "@/components/game/GameDetails";
 import { GameDetailsPageProps } from "@/types/gameDetails";
 
 import { mergeArenaInfo } from "@/lib/mergeGameData";
-import { getUpcomingGames } from "@/lib/staticCache";
+import { getUpcomingGames, getEvResults } from "@/lib/staticCache";
 import { connectToDatabase } from "@/lib/mongodb";
 import { getTeamLogo } from "@/lib/teamNameMap";
+import { deduplicateGames } from "@/lib/utils"; 
 
 
 export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
@@ -19,7 +20,7 @@ export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
   if (!baseGameRecord) {
     return <p className="text-center text-gray-600">No game data available.</p>;
   }
-  
+
   const upcomingGames = await getUpcomingGames();
   const mergedGameRecord = await mergeArenaInfo(baseGameRecord, upcomingGames);
   mergedGameRecord._id = mergedGameRecord._id.toString(); // plain object ID for JSON serialization.. sucks i guess
@@ -29,6 +30,10 @@ export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
     .find({ home_team, away_team, commence_time })
     .toArray();
 
+  const evResults = await getEvResults();
+  const uniqueGameRecords = deduplicateGames(evResults);
+  const gameIds = uniqueGameRecords.map((game) => game._id.toString());
+  
   const bookmakers = gameRecords.map((record) => ({
     book: record.bookmaker,
     home_moneyline: record.home_odds.toString(),
@@ -83,6 +88,8 @@ export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
         oddsData={oddsData}
         logos={teamLogos}
         gameDetails={gameDetails}
+        gameIds={gameIds}              
+        currentGameId={mergedGameRecord._id}
       />
     </div>
   );

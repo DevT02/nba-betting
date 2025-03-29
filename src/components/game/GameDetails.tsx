@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useRouter } from "next/navigation";
 import OddsTable from "./OddsTable";
 import Header from "./Header";
 import { FaTrophy } from "react-icons/fa";
@@ -34,9 +35,12 @@ export type GameDetailsProps = {
     game_time: string;
     arena: string;
   };
+  gameIds?: string[];
+  currentGameId?: string;
 };
 
-function GameDetails({ teamNames, oddsData, logos, gameDetails }: GameDetailsProps) {
+function GameDetails({ teamNames, oddsData, logos, gameDetails, gameIds, currentGameId }: GameDetailsProps) {
+  const router = useRouter();
   const userTimeZone = useUserTimeZone();
   const getTeamLogo = (team: string) => `/logos/${team}.svg`;
   const eventTime = new Date(gameDetails.game_time);
@@ -47,6 +51,7 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails }: GameDetailsPro
     timeZoneName: "short",
   }).format(eventTime);
 
+  // determine the best team based on the highest probability from the odds data
   const bestTeam = React.useMemo(() => {
     return teamNames.reduce((prev, curr) => {
       const currProb = parseFloat(oddsData[curr][0]?.probability.replace("%", "")) || 0;
@@ -55,9 +60,43 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails }: GameDetailsPro
     }, teamNames[0]);
   }, [teamNames, oddsData]);
 
+  // logos for the teams 
   const logoLeft = logos?.[teamNames[0]] ?? getTeamLogo(teamNames[0]);
   const logoRight = logos?.[teamNames[1]] ?? getTeamLogo(teamNames[1]);
 
+  // cool navigation helpers if gameids and currgameid are provided
+  const getAdjacentGameId = (direction: "prev" | "next") => {
+    if (!gameIds || !currentGameId) return null;
+    const index = gameIds.indexOf(currentGameId);
+    if (index === -1) return null;
+    const newIndex = direction === "prev" ? index - 1 : index + 1;
+    return gameIds[newIndex] || null;
+  };
+
+  React.useEffect(() => {
+    if (!gameIds || !currentGameId) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        const prevId = getAdjacentGameId("prev");
+        if (prevId) {
+          router.push(`/gamedetails/${prevId}`);
+        }
+      } else if (e.key === "ArrowRight") {
+        const nextId = getAdjacentGameId("next");
+        if (nextId) {
+          router.push(`/gamedetails/${nextId}`);
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [gameIds, currentGameId, router]);
+
+  // get adjacent game IDs for preview buttons
+  const prevId = getAdjacentGameId("prev");
+  const nextId = getAdjacentGameId("next");
+  
+  /* scroll stuff for h2h, etc content */
   const [showLeftGradient, setShowLeftGradient] = React.useState(false);
   const [showRightGradient, setShowRightGradient] = React.useState(true);
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
@@ -193,6 +232,28 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails }: GameDetailsPro
           </Tabs>
         </div>
 
+        {/* Navigation buttons for adjacent games */}
+        { (prevId || nextId) && (
+          <div className="flex justify-between items-center mt-4">
+            {prevId && (
+              <button
+                onClick={() => router.push(`/gamedetails/${prevId}`)}
+                className="p-2 border rounded hover:bg-gray-200 dark:hover:bg-gray-800 transition"
+              >
+                &#8592; Previous
+              </button>
+            )}
+            {nextId && (
+              <button
+                onClick={() => router.push(`/gamedetails/${nextId}`)}
+                className="p-2 border rounded hover:bg-gray-200 dark:hover:bg-gray-800 transition"
+              >
+                Next &#8594;
+              </button>
+            )}
+          </div>
+        )}
+ 
         <div className="mt-8 p-4 bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-900 dark:to-blue-800 border border-blue-500 dark:border-blue-700 rounded-lg shadow-xl flex items-center justify-center">
           <p className="text-center text-[0.75rem] sm:text-base font-bold text-white">
             AI Prediction: <span className="underline">{bestTeam}</span> is most likely to win!

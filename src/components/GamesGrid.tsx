@@ -26,7 +26,7 @@ export default function GamesGrid({ games, activeTab }: GamesGridProps) {
           return (
             <Link key={gameId} href={`/gamedetails/${gameId}`}>
               <div
-                className="w-full rounded-lg p-4 sm:p-5 shadow-sm cursor-pointer border border-gray-200 dark:border-zinc-800 min-h-[280px]"
+                className="w-full rounded-lg p-4 sm:p-5 shadow-sm cursor-pointer border border-gray-200 dark:border-zinc-800 flex flex-col"
                 style={{
                   backgroundColor: "hsl(var(--card))",
                   color: "hsl(var(--card-foreground))",

@@ -17,6 +17,11 @@ export const metadata: Metadata = {
   description: "Analyze NBA betting data and find the best deals with Iverson Bets, your go-to platform for smarter betting",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

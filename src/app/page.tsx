@@ -165,28 +165,26 @@ export default async function Home({
       <TimeZoneSync />
       <Header />
       <div className="flex-1 w-full max-w-6xl mx-auto p-4 flex gap-6">
-        <div className="flex-1">
+      <div className="flex-1 w-full max-w-6xl mx-auto px-4 flex flex-col gap-3">
           <div className="flex items-center justify-between mb-6">
-            <div className="flex gap-6">
-              {["Featured", "Today", "Tomorrow", "Upcoming"].map((tabName) => (
-                <Link
-                  key={tabName}
-                  href={`/?tab=${tabName}`}
-                  className={`font-medium pb-1 border-b-2 ${
-                    activeTab === tabName
-                      ? "border-red-500 dark:border-red-300"
-                      : "border-transparent text-gray-500 dark:text-gray-400"
-                  }`}
-                  
-                >
-                  {tabName}
-                </Link>
-              ))}
-            </div>
-          </div>
+        <div className="pt-3 flex items-center gap-6">
+          {["Featured", "Today", "Tomorrow", "Upcoming"].map((tabName) => (
+            <Link
+              key={tabName}
+              href={`/?tab=${tabName}`}
+              className={`font-medium pb-1 border-b-2 ${
+                activeTab === tabName
+                  ? "border-red-500 dark:border-red-300"
+                  : "border-transparent text-gray-500 dark:text-gray-400"
+              }`}
+            >
+              {tabName}
+            </Link>
+          ))}
+        </div>
 
           <GamesGrid games={games} activeTab={activeTab} />
-        </div>
+        <GamesGrid games={games} activeTab={activeTab} />
       </div>
     </div>
   );

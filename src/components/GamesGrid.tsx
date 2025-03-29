@@ -17,6 +17,7 @@ export default function GamesGrid({ games, activeTab }: GamesGridProps) {
 
   return (
     <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {games.length > 0 ? (
         games.map((game) => {
           const gameTime = new Date(game.commence_time);
@@ -26,7 +27,7 @@ export default function GamesGrid({ games, activeTab }: GamesGridProps) {
           return (
             <Link key={gameId} href={`/gamedetails/${gameId}`}>
               <div
-                className="rounded-lg p-5 shadow-sm cursor-pointer border border-gray-200 dark:border-zinc-800"
+                className="w-full rounded-lg p-4 sm:p-5 shadow-sm cursor-pointer border border-gray-200 dark:border-zinc-800 min-h-[280px]"
                 style={{
                   backgroundColor: "hsl(var(--card))",
                   color: "hsl(var(--card-foreground))",
@@ -34,7 +35,7 @@ export default function GamesGrid({ games, activeTab }: GamesGridProps) {
               >
                 <div className="flex items-center gap-2 mb-4">
                   <Calendar className="h-5 w-5" />
-                  <span className="font-semibold">
+                  <span className="font-semibold text-sm sm:text-base">
                     {gameTime.toLocaleDateString(undefined, {
                       weekday: "long",
                       year: "numeric",
@@ -44,40 +45,34 @@ export default function GamesGrid({ games, activeTab }: GamesGridProps) {
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full overflow-hidden bg-white border border-gray-200">
+                  <div className="w-16 h-16 sm:w-12 sm:h-12 rounded-full overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 flex-shrink-0">
                     <img
                       src={getTeamLogo(home_team)}
                       alt={`${home_team} logo`}
                       className="object-contain w-full h-full p-1"
                     />
                   </div>
-                  <span className="font-semibold text-lg">
-                    {home_team}
-                  </span>
+                  <span className="font-semibold text-lg">{home_team}</span>
                 </div>
                 <div className="flex items-center gap-3 mt-3">
-                  <div className="w-12 h-12 rounded-full overflow-hidden bg-white border border-gray-200">
+                  <div className="w-16 h-16 sm:w-12 sm:h-12 rounded-full overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 flex-shrink-0">
                     <img
                       src={getTeamLogo(away_team)}
                       alt={`${away_team} logo`}
                       className="object-contain w-full h-full p-1"
                     />
                   </div>
-                  <span className="font-semibold text-lg">
-                    {away_team}
-                  </span>
+                  <span className="font-semibold text-lg">{away_team}</span>
                 </div>
                 <div className="mt-5 pt-4 border-t flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm">
                     <MapPin className="h-5 w-5" />
-                    <span className="font-medium">
-                      {game.arena || "TBD"}
-                    </span>
+                    <span className="font-medium">{game.arena || "TBD"}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm font-semibold">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold">
                     <Clock className="h-5 w-5" />
                     <span>
-                      {formatInTimeZone(gameTime, userTimeZone, 'h:mm a zzz')}
+                      {formatInTimeZone(gameTime, userTimeZone, "h:mm a zzz")}
                     </span>
                   </div>
                 </div>
@@ -86,7 +81,7 @@ export default function GamesGrid({ games, activeTab }: GamesGridProps) {
           );
         })
       ) : (
-        <p className="text-center col-span-2">
+        <p className="text-center col-span-full">
           No games available for {activeTab}.
         </p>
       )}

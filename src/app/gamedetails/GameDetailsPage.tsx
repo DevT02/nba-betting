@@ -1,6 +1,6 @@
 import React from "react";
 import { ObjectId } from "mongodb";
-import GameDetails from "@/components/game/GameDetails";
+import GameDetails, { GamePreview } from "@/components/game/GameDetails";
 import { GameDetailsPageProps } from "@/types/gameDetails";
 
 import { mergeArenaInfo } from "@/lib/mergeGameData";
@@ -32,6 +32,11 @@ export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
 
   const evResults = await getEvResults();
   const uniqueGameRecords = deduplicateGames(evResults);
+  const gamePreviews: Record<string, GamePreview> = {};
+  uniqueGameRecords.forEach((game) => {
+    const id = game._id.toString();
+    gamePreviews[id] = {_id: id, home_team: game.home_team, away_team: game.away_team, commence_time: game.commence_time};
+  });
   const gameIds = uniqueGameRecords.map((game) => game._id.toString());
   
   const bookmakers = gameRecords.map((record) => ({
@@ -90,6 +95,7 @@ export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
         gameDetails={gameDetails}
         gameIds={gameIds}              
         currentGameId={mergedGameRecord._id}
+        gamePreviews={gamePreviews}
       />
     </div>
   );

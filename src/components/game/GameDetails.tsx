@@ -12,6 +12,15 @@ import {
   TrendingUpIcon,
 } from "lucide-react";
 import { useUserTimeZone } from "@/lib/timeZone";
+import { AdjacentGamePreview } from "@/components/game/AdjacentGamePreview";
+import { motion } from "framer-motion";
+
+export type GamePreview = {
+  _id: string;
+  home_team: string;
+  away_team: string;
+  commence_time: string;
+};
 
 export type OddsRow = {
   book: string;
@@ -37,9 +46,10 @@ export type GameDetailsProps = {
   };
   gameIds?: string[];
   currentGameId?: string;
+  gamePreviews?: Record<string, GamePreview>;
 };
 
-function GameDetails({ teamNames, oddsData, logos, gameDetails, gameIds, currentGameId }: GameDetailsProps) {
+function GameDetails({ teamNames, oddsData, logos, gameDetails, gameIds, currentGameId, gamePreviews }: GameDetailsProps) {
   const router = useRouter();
   const userTimeZone = useUserTimeZone();
   const getTeamLogo = (team: string) => `/logos/${team}.svg`;
@@ -51,7 +61,7 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails, gameIds, current
     timeZoneName: "short",
   }).format(eventTime);
 
-  // determine the best team based on the highest probability from the odds data
+  // Determine the best team based on the highest probability from the odds data
   const bestTeam = React.useMemo(() => {
     return teamNames.reduce((prev, curr) => {
       const currProb = parseFloat(oddsData[curr][0]?.probability.replace("%", "")) || 0;
@@ -95,6 +105,46 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails, gameIds, current
   // get adjacent game IDs for preview buttons
   const prevId = getAdjacentGameId("prev");
   const nextId = getAdjacentGameId("next");
+
+  // Look up preview data from the mapping if available
+  const [showLeftPreview, setShowLeftPreview] = React.useState(false);
+  const [showRightPreview, setShowRightPreview] = React.useState(false);
+  const prevPreview = prevId && gamePreviews ? gamePreviews[prevId] : null;
+  const nextPreview = nextId && gamePreviews ? gamePreviews[nextId] : null;
+  const currentIndex: number = gameIds && currentGameId ? gameIds.indexOf(currentGameId) : -1;
+  const prevPreviews: GamePreview[] =
+    gameIds && currentIndex > 0
+      ? gameIds
+          .slice(Math.max(0, currentIndex - 3), currentIndex)
+          .map((id) => gamePreviews ? gamePreviews[id] : undefined)
+          .filter((preview): preview is GamePreview => Boolean(preview))
+      : [];
+
+  const nextPreviews: GamePreview[] =
+    gameIds && currentIndex !== -1 && currentIndex < gameIds.length - 1
+      ? gameIds
+          .slice(currentIndex + 1, currentIndex + 4)
+          .map((id) => gamePreviews ? gamePreviews[id] : undefined)
+          .filter((preview): preview is GamePreview => Boolean(preview))
+      : [];
+  
+  React.useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (e.clientX < 100) {
+        setShowLeftPreview(true);
+        setShowRightPreview(false);
+      } else if (e.clientX > window.innerWidth - 100) {
+        setShowRightPreview(true);
+        setShowLeftPreview(false);
+      } else {
+        setShowLeftPreview(false);
+        setShowRightPreview(false);
+      }
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
   
   /* scroll stuff for h2h, etc content */
   const [showLeftGradient, setShowLeftGradient] = React.useState(false);
@@ -232,28 +282,61 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails, gameIds, current
           </Tabs>
         </div>
 
-        {/* Navigation buttons for adjacent games */}
-        { (prevId || nextId) && (
-          <div className="flex justify-between items-center mt-4">
-            {prevId && (
-              <button
-                onClick={() => router.push(`/gamedetails/${prevId}`)}
-                className="p-2 border rounded hover:bg-gray-200 dark:hover:bg-gray-800 transition"
+        {(prevPreviews.length > 0 || nextPreviews.length > 0) && (
+          <>
+            {prevPreviews.length > 0 && showLeftPreview && (
+              <motion.div
+                initial={{ opacity: 0, x: -150 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -150 }}
+                transition={{ duration: 0.3 }}
+                className="fixed left-0 top-0 bottom-0 w-1/4 bg-gray-100 dark:bg-gray-700 p-4 shadow-xl z-50 cursor-pointer"
+                onClick={() =>
+                  router.push(`/gamedetails/${prevPreviews[0]._id}`)
+                }
               >
-                &#8592; Previous
-              </button>
+                <div className="flex flex-col space-y-4">
+                  {prevPreviews.map((preview) => (
+                    <motion.div
+                      key={preview._id}
+                      whileHover={{ scale: 1.05 }}
+                      className="transition-transform"
+                      onClick={() => router.push(`/gamedetails/${preview._id}`)}
+                    >
+                      <AdjacentGamePreview game={preview} />
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
             )}
-            {nextId && (
-              <button
-                onClick={() => router.push(`/gamedetails/${nextId}`)}
-                className="p-2 border rounded hover:bg-gray-200 dark:hover:bg-gray-800 transition"
+            {nextPreviews.length > 0 && showRightPreview && (
+              <motion.div
+                initial={{ opacity: 0, x: 150 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 150 }}
+                transition={{ duration: 0.3 }}
+                className="fixed right-0 top-0 bottom-0 w-1/4 bg-gray-100 dark:bg-gray-700 p-4 shadow-xl z-50 cursor-pointer"
+                onClick={() =>
+                  router.push(`/gamedetails/${nextPreviews[0]._id}`)
+                }
               >
-                Next &#8594;
-              </button>
+                <div className="flex flex-col space-y-4">
+                  {nextPreviews.map((preview) => (
+                    <motion.div
+                      key={preview._id}
+                      whileHover={{ scale: 1.05 }}
+                      className="transition-transform"
+                      onClick={() => router.push(`/gamedetails/${preview._id}`)}
+                    >
+                      <AdjacentGamePreview game={preview} />
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
             )}
-          </div>
+          </>
         )}
- 
+
         <div className="mt-8 p-4 bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-900 dark:to-blue-800 border border-blue-500 dark:border-blue-700 rounded-lg shadow-xl flex items-center justify-center">
           <p className="text-center text-[0.75rem] sm:text-base font-bold text-white">
             AI Prediction: <span className="underline">{bestTeam}</span> is most likely to win!

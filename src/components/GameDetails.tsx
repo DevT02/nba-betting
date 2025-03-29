@@ -61,10 +61,16 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails }: GameDetailsPro
   const logoRight = logos?.[teamNames[1]] ?? getTeamLogo(teamNames[1]);
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundColor: "hsl(var(--background))",
+        color: "hsl(var(--foreground))",
+      }}
+    >
       <Header />
       <main className="mx-auto px-6 sm:px-8 lg:px-12 mt-6 max-w-6xl">
-        <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-12 min-h-[550px] flex flex-col justify-between">
+        <div className="rounded-2xl shadow-lg p-8 sm:p-12 min-h-[550px] flex flex-col justify-between" style={{ backgroundColor: "hsl(var(--card))", color: "hsl(var(--card-foreground))" }}>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center -mb-3">
             <div className="flex items-center justify-center gap-4">
               <div className="flex items-center justify-center">

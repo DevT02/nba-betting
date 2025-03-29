@@ -38,7 +38,13 @@ This method is common in football and basketball.
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundColor: "hsl(var(--background))",
+        color: "hsl(var(--foreground))",
+      }}
+    >
       <Header />
       <main className="max-w-3xl mx-auto px-6 py-10">
         <h1 className="text-4xl font-bold mb-6">{article.title}</h1>

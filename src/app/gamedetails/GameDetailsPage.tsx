@@ -68,11 +68,19 @@ export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
   const teamNames = [home_team, away_team];
 
   return (
-    <GameDetails
-      teamNames={teamNames}
-      oddsData={oddsData}
-      logos={teamLogos}
-      gameDetails={gameDetails}
-    />
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundColor: "hsl(var(--background))",
+        color: "hsl(var(--foreground))",
+      }}
+    >
+      <GameDetails
+        teamNames={teamNames}
+        oddsData={oddsData}
+        logos={teamLogos}
+        gameDetails={gameDetails}
+      />
+    </div>
   );
 }

@@ -17,6 +17,20 @@ export default async function Home({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  function deduplicateGames(games: any[]) {
+    const seen = new Set();
+    const uniqueGames: any[] = [];
+  
+    for (const game of games) {
+      const key = `${game.home_team}-${game.away_team}-${game.commence_time}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        uniqueGames.push(game);
+      }
+    }
+    return uniqueGames;
+  }
+  
   const sp = await searchParams;
   const { tab, tz } = sp;
 

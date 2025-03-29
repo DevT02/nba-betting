@@ -12,8 +12,6 @@ import {
 } from "lucide-react";
 import { useUserTimeZone } from "@/lib/timeZone";
 
-
-
 export type OddsRow = {
   book: string;
   moneyline: string;
@@ -70,16 +68,20 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails }: GameDetailsPro
     >
       <Header />
       <main className="mx-auto px-6 sm:px-8 lg:px-12 mt-6 max-w-6xl">
-        <div className="rounded-2xl shadow-lg p-8 sm:p-12 min-h-[550px] flex flex-col justify-between" style={{ backgroundColor: "hsl(var(--card))", color: "hsl(var(--card-foreground))" }}>
+        <div
+          className="rounded-2xl shadow-lg border border-gray-200 dark:border-zinc-800 p-8 sm:p-12 min-h-[550px] flex flex-col justify-between"
+          style={{
+            backgroundColor: "hsl(var(--card))",
+            color: "hsl(var(--card-foreground))",
+          }}
+        >
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center -mb-3">
-            <div className="flex items-center justify-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-4">
               <div className="flex items-center justify-center">
                 <img
                   src={logoLeft}
                   alt={`${teamNames[0]} logo`}
-                  width={70}
-                  height={70}
-                  className="min-w-[70px] flex-shrink-0"
+                  className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 flex-shrink-0"
                 />
               </div>
               <span className="whitespace-nowrap">
@@ -89,21 +91,19 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails }: GameDetailsPro
                 <img
                   src={logoRight}
                   alt={`${teamNames[1]} logo`}
-                  width={70}
-                  height={70}
-                  className="min-w-[70px] flex-shrink-0"
+                  className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 flex-shrink-0"
                 />
               </div>
             </div>
           </h1>
 
           <div className="mb-4 space-y-3">
-            <div className="flex items-center justify-center gap-3 text-sm sm:text-base text-gray-600 mt-4">
-              <div className="flex items-center gap-1.5 bg-gray-100 px-3 py-1 rounded-full">
+            <div className="flex items-center justify-center gap-3 text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-4">
+              <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
                 <ClockIcon className="h-4 w-4" />
                 <span>{formattedTime}</span>
               </div>
-              <div className="flex items-center gap-1.5 bg-gray-100 px-3 py-1 rounded-full">
+              <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
                 <MapPinIcon className="h-4 w-4" />
                 <span>{gameDetails.arena || "TBD"}</span>
               </div>
@@ -127,7 +127,7 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails }: GameDetailsPro
             </div>
           </div>
 
-          <div className="flex font-inter items-center justify-center gap-2 text-base sm:text-lg text-gray-800 mb-4">
+          <div className="flex font-inter items-center justify-center gap-2 text-base sm:text-lg text-gray-800 dark:text-gray-200 mb-4">
             <FaTrophy className="text-yellow-500 h-4 w-4" />
             <span className="font-bold">{bestTeam}</span>
             <span className="text-xs sm:text-base font-normal">
@@ -154,8 +154,8 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails }: GameDetailsPro
           </Tabs>
         </div>
 
-        <div className="mt-12 p-5 bg-gradient-to-r from-blue-200 to-blue-100 border border-blue-300 rounded-lg shadow-lg flex items-center justify-center">
-          <p className="text-center text-lg sm:text-xl font-bold text-blue-800">
+        <div className="mt-12 p-5 bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-900 dark:to-blue-800 border border-blue-500 dark:border-blue-700 rounded-lg shadow-xl flex items-center justify-center">
+          <p className="text-center text-lg sm:text-xl font-bold text-white">
             AI Prediction: <span className="underline">{bestTeam}</span> is most likely to win!
           </p>
         </div>

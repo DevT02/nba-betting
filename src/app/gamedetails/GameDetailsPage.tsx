@@ -1,10 +1,12 @@
 import React from "react";
 import { ObjectId } from "mongodb";
 import GameDetails from "@/components/GameDetails";
+import { GameDetailsPageProps } from "@/types/gameDetails";
+
+import { mergeArenaInfo } from "@/lib/mergeGameData";
+import { getUpcomingGames } from "@/lib/staticCache";
 import { connectToDatabase } from "@/lib/mongodb";
 import { getTeamLogo } from "@/lib/teamNameMap";
-import { GameDetailsPageProps } from "@/types/gameDetails";
-import { mergeArenaInfo } from "@/lib/mergeGameData";
 
 
 export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
@@ -17,8 +19,9 @@ export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
   if (!baseGameRecord) {
     return <p className="text-center text-gray-600">No game data available.</p>;
   }
-
-  const mergedGameRecord = await mergeArenaInfo(baseGameRecord, db);
+  
+  const upcomingGames = await getUpcomingGames();
+  const mergedGameRecord = await mergeArenaInfo(baseGameRecord, upcomingGames);
   mergedGameRecord._id = mergedGameRecord._id.toString(); // plain object ID for JSON serialization.. sucks i guess
 
   const { home_team, away_team, commence_time } = mergedGameRecord;

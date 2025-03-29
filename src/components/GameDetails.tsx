@@ -75,7 +75,6 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails }: GameDetailsPro
             color: "hsl(var(--card-foreground))",
           }}
         >
-          {/* Header Section */}
           <h1 className="font-bold text-center -mb-2">
             <div className="flex items-center justify-center gap-2 sm:gap-4 flex-wrap">
               <img
@@ -94,7 +93,6 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails }: GameDetailsPro
             </div>
           </h1>
 
-          {/* Info Badges */}
           <div className="mb-4 space-y-2">
             <div className="flex items-center justify-center gap-2 text-[0.65rem] sm:text-xs text-gray-600 dark:text-gray-300 mt-2">
               <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
@@ -125,7 +123,6 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails }: GameDetailsPro
             </div>
           </div>
 
-          {/* Trophy Section */}
           <div className="flex font-inter items-center justify-center gap-2 text-[0.75rem] sm:text-xs md:text-lg text-gray-800 dark:text-gray-200 mb-4">
             <FaTrophy className="text-yellow-500 h-3 w-3 sm:h-4 sm:w-4" />
             <span className="font-bold">{bestTeam}</span>
@@ -134,9 +131,8 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails }: GameDetailsPro
             </span>
           </div>
 
-          {/* Tabs Section */}
           <Tabs defaultValue={teamNames[0]}>
-            <TabsList className="flex justify-center space-x-1 mb-4">
+            <TabsList className="flex justify-center space-x-3 mb-4">
               {teamNames.map((team) => (
                 <TabsTrigger key={team} value={team}>
                   {team}
@@ -154,7 +150,6 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails }: GameDetailsPro
           </Tabs>
         </div>
 
-        {/* Prediction Card */}
         <div className="mt-8 p-4 bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-900 dark:to-blue-800 border border-blue-500 dark:border-blue-700 rounded-lg shadow-xl flex items-center justify-center">
           <p className="text-center text-[0.75rem] sm:text-base font-bold text-white">
             AI Prediction: <span className="underline">{bestTeam}</span> is most likely to win!

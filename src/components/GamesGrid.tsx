@@ -16,7 +16,6 @@ export default function GamesGrid({ games, activeTab }: GamesGridProps) {
   const userTimeZone = useUserTimeZone();
 
   return (
-    <div className="grid grid-cols-2 gap-4">
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {games.length > 0 ? (
         games.map((game) => {

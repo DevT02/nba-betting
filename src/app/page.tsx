@@ -31,7 +31,6 @@ export default async function Home({
   let games: any[] = [];
 
   if (activeTab === "Featured") {
-    // Only include games on the current day (from now until end of today)
     games = await db.collection("ev_results")
       .aggregate([
         {
@@ -164,10 +163,8 @@ export default async function Home({
     >
       <TimeZoneSync />
       <Header />
-      <div className="flex-1 w-full max-w-6xl mx-auto p-4 flex gap-6">
-      <div className="flex-1 w-full max-w-6xl mx-auto px-4 flex flex-col gap-3">
-          <div className="flex items-center justify-between mb-6">
-        <div className="pt-3 flex items-center gap-6">
+      <div className="flex-1 w-full max-w-6xl mx-auto px-4 flex flex-col gap-4">
+        <div className="pt-4 flex items-center gap-6">
           {["Featured", "Today", "Tomorrow", "Upcoming"].map((tabName) => (
             <Link
               key={tabName}
@@ -183,7 +180,6 @@ export default async function Home({
           ))}
         </div>
 
-          <GamesGrid games={games} activeTab={activeTab} />
         <GamesGrid games={games} activeTab={activeTab} />
       </div>
     </div>

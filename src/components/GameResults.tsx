@@ -5,15 +5,28 @@ export default async function GameResults() {
   const results = await db.collection("games").find({}).toArray();
 
   return (
-    <div className="p-4">
+    <div
+      className="p-4"
+      style={{
+        backgroundColor: "hsl(var(--background))",
+        color: "hsl(var(--foreground))",
+      }}
+    >
       <h2 className="text-xl font-bold mb-4">Game Results</h2>
       <ul className="space-y-3">
         {results.map((game) => (
-          <li key={game._id.toString()} className="bg-white p-4 shadow rounded">
+          <li
+            key={game._id.toString()}
+            className="p-4 shadow rounded"
+            style={{
+              backgroundColor: "hsl(var(--card))",
+              color: "hsl(var(--card-foreground))",
+            }}
+          >
             <p className="text-lg font-semibold">
               {game.home_team} vs. {game.away_team}
             </p>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm">
               {new Date(game.commence_time).toLocaleString()}
             </p>
             <p className="text-sm">

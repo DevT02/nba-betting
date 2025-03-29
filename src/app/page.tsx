@@ -38,7 +38,7 @@ export default async function Home({
           $match: {
             $expr: {
               $and: [
-                { $gte: [ "$commence_time", now ] },
+                { $gte: [ "$commence_time", new Date(startTodayStr) ] },
                 { $lte: [ "$commence_time", new Date(endTodayStr) ] }
               ]
             }
@@ -52,29 +52,22 @@ export default async function Home({
               commence_time: "$commence_time",
             },
             doc: { $first: "$$ROOT" },
-            maxHomeEV: { $max: "$home_ev" },
-            maxAwayEV: { $max: "$away_ev" },
+            maxHomeProb: { $max: "$home_win_prob" },
+            maxAwayProb: { $max: "$away_win_prob" },
           },
         },
         {
           $addFields: {
-            maxPositiveEV: {
-              $cond: [
-                { $gt: [{ $max: ["$maxHomeEV", "$maxAwayEV"] }, 0] },
-                { $max: ["$maxHomeEV", "$maxAwayEV"] },
-                -1,
-              ],
-            },
+            maxProbability: { $max: ["$maxHomeProb", "$maxAwayProb"] }
           },
         },
-        { $match: { maxPositiveEV: { $gt: 0 } } },
-        { $sort: { maxPositiveEV: -1 } },
+        { $sort: { maxProbability: -1 } },
         { $limit: 4 },
         { $replaceRoot: { newRoot: "$doc" } },
       ])
       .toArray();
-  } else if (activeTab === "Today") {
-    games = await db.collection("ev_results")
+    } else if (activeTab === "Today") {
+      games = await db.collection("ev_results")
       .aggregate([
         {
           $match: {
@@ -162,7 +155,13 @@ export default async function Home({
   games = JSON.parse(JSON.stringify(games)); // for json serialization
 
   return (
-    <div className="w-full min-h-screen flex flex-col bg-gray-100">
+    <div
+      className="w-full min-h-screen flex flex-col"
+      style={{
+        backgroundColor: "hsl(var(--background))",
+        color: "hsl(var(--foreground))",
+      }}
+    >
       <TimeZoneSync />
       <Header />
       <div className="flex-1 w-full max-w-6xl mx-auto p-4 flex gap-6">
@@ -175,9 +174,10 @@ export default async function Home({
                   href={`/?tab=${tabName}`}
                   className={`font-medium pb-1 border-b-2 ${
                     activeTab === tabName
-                      ? "border-red-500"
-                      : "border-transparent text-gray-500"
+                      ? "border-red-500 dark:border-red-300"
+                      : "border-transparent text-gray-500 dark:text-gray-400"
                   }`}
+                  
                 >
                   {tabName}
                 </Link>
@@ -190,5 +190,4 @@ export default async function Home({
       </div>
     </div>
   );
-
 }

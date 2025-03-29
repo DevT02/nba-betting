@@ -15,8 +15,14 @@ type OddsTableProps = {
 
 const OddsTable: React.FC<OddsTableProps> = ({ oddsData }) => {
   return (
-    <div className="mt-6 overflow-x-auto">
-      <Table className="w-full text-sm text-gray-700">
+    <div
+      className="mt-6 overflow-x-auto"
+      style={{
+        backgroundColor: "hsl(var(--card))",
+        color: "hsl(var(--card-foreground))",
+      }}
+    >
+      <Table className="w-full text-sm">
         <TableHeader>
           <TableRow>
             <TableHead className="font-bold">Casino</TableHead>
@@ -27,7 +33,6 @@ const OddsTable: React.FC<OddsTableProps> = ({ oddsData }) => {
         </TableHeader>
         <TableBody>
           {oddsData?.map((row, idx) => {
-            // Parse edge value for conditional formatting
             const edgeValue = parseFloat(row.edge);
             const edgeColorClass =
               edgeValue > 0

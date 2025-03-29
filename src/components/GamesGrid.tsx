@@ -20,16 +20,21 @@ export default function GamesGrid({ games, activeTab }: GamesGridProps) {
       {games.length > 0 ? (
         games.map((game) => {
           const gameTime = new Date(game.commence_time);
-          const home_team = game.home_team;
-          const away_team = game.away_team;
+          const { home_team, away_team } = game;
           const gameId = game._id.toString();
 
           return (
             <Link key={gameId} href={`/gamedetails/${gameId}`}>
-              <div className="bg-white rounded-lg p-5 shadow-md cursor-pointer">
-                <div className="flex items-center gap-2 text-gray-700 mb-4">
-                  <Calendar className="h-5 w-5 text-gray-500" />
-                  <span className="font-semibold text-md">
+              <div
+                className="rounded-lg p-5 shadow-sm cursor-pointer border border-gray-200 dark:border-zinc-800"
+                style={{
+                  backgroundColor: "hsl(var(--card))",
+                  color: "hsl(var(--card-foreground))",
+                }}
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <Calendar className="h-5 w-5" />
+                  <span className="font-semibold">
                     {gameTime.toLocaleDateString(undefined, {
                       weekday: "long",
                       year: "numeric",
@@ -46,7 +51,7 @@ export default function GamesGrid({ games, activeTab }: GamesGridProps) {
                       className="object-contain w-full h-full p-1"
                     />
                   </div>
-                  <span className="font-semibold text-lg text-gray-900">
+                  <span className="font-semibold text-lg">
                     {home_team}
                   </span>
                 </div>
@@ -58,20 +63,20 @@ export default function GamesGrid({ games, activeTab }: GamesGridProps) {
                       className="object-contain w-full h-full p-1"
                     />
                   </div>
-                  <span className="font-semibold text-lg text-gray-900">
+                  <span className="font-semibold text-lg">
                     {away_team}
                   </span>
                 </div>
                 <div className="mt-5 pt-4 border-t flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-gray-500">
+                  <div className="flex items-center gap-2 text-sm">
                     <MapPin className="h-5 w-5" />
-                    <span className="text-sm font-medium">
+                    <span className="font-medium">
                       {game.arena || "TBD"}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-700">
+                  <div className="flex items-center gap-2 text-sm font-semibold">
                     <Clock className="h-5 w-5" />
-                    <span className="font-semibold text-sm">
+                    <span>
                       {formatInTimeZone(gameTime, userTimeZone, 'h:mm a zzz')}
                     </span>
                   </div>
@@ -81,7 +86,7 @@ export default function GamesGrid({ games, activeTab }: GamesGridProps) {
           );
         })
       ) : (
-        <p className="text-gray-600 text-center col-span-2">
+        <p className="text-center col-span-2">
           No games available for {activeTab}.
         </p>
       )}

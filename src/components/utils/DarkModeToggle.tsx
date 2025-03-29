@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { useState, useEffect } from 'react';
 import { Moon, Sun } from 'lucide-react';
 
@@ -12,7 +12,6 @@ export function DarkModeToggle() {
     document.documentElement.classList.remove('dark', 'light');
     document.documentElement.classList.add(prefersDark ? 'dark' : 'light');
   }, []);
-  
 
   const toggleDarkMode = () => {
     setDarkMode((prevMode) => {
@@ -28,9 +27,11 @@ export function DarkModeToggle() {
     <button
       onClick={toggleDarkMode}
       aria-label="Toggle dark mode"
-      className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+      className="p-2 rounded-full transition-all duration-300 hover:scale-110 hover:bg-gray-100 dark:hover:bg-gray-800"
     >
-      {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      <span className={`${darkMode ? "rotate-0" : "rotate-180"} transition-transform duration-300`}>
+        {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      </span>
     </button>
   );
 }

@@ -58,6 +58,34 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails }: GameDetailsPro
   const logoLeft = logos?.[teamNames[0]] ?? getTeamLogo(teamNames[0]);
   const logoRight = logos?.[teamNames[1]] ?? getTeamLogo(teamNames[1]);
 
+  const [showLeftGradient, setShowLeftGradient] = React.useState(false);
+  const [showRightGradient, setShowRightGradient] = React.useState(true);
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+  const handleScroll = () => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+    setShowLeftGradient(scrollContainer.scrollLeft > 5);
+    setShowRightGradient(
+      scrollContainer.scrollWidth > scrollContainer.clientWidth &&
+      scrollContainer.scrollLeft < (scrollContainer.scrollWidth - scrollContainer.clientWidth - 5)
+    );
+  };
+
+  React.useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      handleScroll();
+      scrollContainer.addEventListener('scroll', handleScroll);
+      window.addEventListener('resize', handleScroll);
+    }
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener('scroll', handleScroll);
+      }
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, []);
+
   return (
     <div
       className="min-h-screen"
@@ -75,10 +103,7 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails }: GameDetailsPro
             color: "hsl(var(--card-foreground))",
           }}
         >
-
-          {/* Title section */}
           <div className="flex flex-col items-center gap-6 mb-8">
-            {/* Title section */}
             <h1 className="font-bold text-center">
               <div className="flex items-center justify-center gap-2 sm:gap-4 flex-nowrap">
                 <img
@@ -109,26 +134,37 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails }: GameDetailsPro
             </div>
 
             <div className="py-1 w-full">
-              <div className="border-t border-b border-gray-100 dark:border-gray-800/50 py-3 flex items-center justify-center gap-x-6 sm:gap-x-8 overflow-x-auto whitespace-nowrap px-4 text-xs sm:text-sm">
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="font-medium text-purple-500 dark:text-purple-400">H2H:</span>
-                  <span>{gameDetails.h2h_record}</span>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <TrendingUpIcon className="h-4 w-4 text-green-500 dark:text-green-400" />
-                  <span>{gameDetails.over_under}</span>
-                </div>
-                {gameDetails.player_injury && (
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <AlertTriangleIcon className="h-4 w-4 text-red-500 dark:text-red-400" />
-                    <span>{gameDetails.player_injury}</span>
+              <div className="border-t border-b border-gray-100 dark:border-gray-800/50 relative">
+                {showLeftGradient && (
+                  <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-white dark:from-zinc-900 to-transparent pointer-events-none z-10"></div>
+                )}
+                
+                <div 
+                  ref={scrollContainerRef}
+                  className="py-3 flex items-center justify-start md:justify-center gap-x-6 sm:gap-x-8 overflow-x-auto whitespace-nowrap px-4 text-xs sm:text-sm scroll-pl-4"
+                  onScroll={handleScroll}
+                >
+                  <div className="flex items-center gap-2 flex-shrink-0 pl-2">
+                    <span className="font-medium text-purple-500 dark:text-purple-400">H2H:</span>
+                    <span>{gameDetails.h2h_record}</span>
                   </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <TrendingUpIcon className="h-4 w-4 text-green-500 dark:text-green-400" />
+                    <span>{gameDetails.over_under}</span>
+                  </div>
+                  {gameDetails.player_injury && (
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <AlertTriangleIcon className="h-4 w-4 text-red-500 dark:text-red-400" />
+                      <span>{gameDetails.player_injury}</span>
+                    </div>
+                  )}
+                </div>
+                {showRightGradient && (
+                  <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white dark:from-zinc-900 to-transparent pointer-events-none z-10"></div>
                 )}
               </div>
-
             </div>
 
-            {/* Prediction with subtle highlight */}
             <div className="flex items-center justify-center gap-2 text-sm sm:text-base md:text-lg border border-yellow-200 dark:border-yellow-900/50 px-4 py-2 rounded-lg">
               <FaTrophy className="text-yellow-500 dark:text-yellow-400 h-4 w-4 sm:h-5 sm:w-5" />
               <span className="font-bold">{bestTeam}</span>

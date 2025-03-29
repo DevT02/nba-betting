@@ -46,22 +46,22 @@ export default function GamesGrid({ games, activeTab }: GamesGridProps) {
                 <div className="flex items-center gap-3">
                   <div className="w-16 h-16 sm:w-12 sm:h-12 rounded-full overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 flex-shrink-0">
                     <img
-                      src={getTeamLogo(home_team)}
-                      alt={`${home_team} logo`}
-                      className="object-contain w-full h-full p-1"
-                    />
-                  </div>
-                  <span className="font-semibold text-lg">{home_team}</span>
-                </div>
-                <div className="flex items-center gap-3 mt-3">
-                  <div className="w-16 h-16 sm:w-12 sm:h-12 rounded-full overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 flex-shrink-0">
-                    <img
                       src={getTeamLogo(away_team)}
                       alt={`${away_team} logo`}
                       className="object-contain w-full h-full p-1"
                     />
                   </div>
                   <span className="font-semibold text-lg">{away_team}</span>
+                </div>
+                <div className="flex items-center gap-3 mt-3">
+                  <div className="w-16 h-16 sm:w-12 sm:h-12 rounded-full overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 flex-shrink-0">
+                    <img
+                      src={getTeamLogo(home_team)}
+                      alt={`${home_team} logo`}
+                      className="object-contain w-full h-full p-1"
+                    />
+                  </div>
+                  <span className="font-semibold text-lg">{home_team}</span>
                 </div>
                 <div className="mt-5 pt-4 border-t flex items-center justify-between">
                   <div className="flex items-center gap-2 text-xs sm:text-sm">

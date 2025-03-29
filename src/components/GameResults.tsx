@@ -1,9 +1,7 @@
-import { connectToDatabase } from "@/lib/mongodb";
+import { getGames } from "@/lib/staticCache";
 
 export default async function GameResults() {
-  const { db } = await connectToDatabase();
-  const results = await db.collection("games").find({}).toArray();
-
+  const results = await getGames();
   return (
     <div
       className="p-4"

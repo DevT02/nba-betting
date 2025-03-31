@@ -1,6 +1,6 @@
 import React from "react";
 import { ObjectId } from "mongodb";
-import GameDetails, { GamePreview } from "@/components/game/GameDetails";
+import GameDetails from "@/components/game/GameDetails";
 import { GameDetailsPageProps } from "@/types/gameDetails";
 
 import { mergeArenaInfo } from "@/lib/mergeGameData";
@@ -8,6 +8,8 @@ import { getUpcomingGames, getEvResults } from "@/lib/staticCache";
 import { connectToDatabase } from "@/lib/mongodb";
 import { getTeamLogo } from "@/lib/teamNameMap";
 import { deduplicateGames } from "@/lib/utils"; 
+
+import { GamePreview } from "@/types/game";
 
 
 export default async function GameDetailsPage({ id }: GameDetailsPageProps) {

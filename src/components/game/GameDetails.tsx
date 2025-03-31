@@ -149,7 +149,6 @@ function GameDetails({teamNames, oddsData, logos, gameDetails, gameIds, currentG
           <motion.div
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
-            dragPropagation={true} 
             onDragEnd={handleDragEnd}
             variants={cardVariants}
             initial="initial"

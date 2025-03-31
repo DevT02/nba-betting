@@ -200,7 +200,7 @@ function GameDetails({ teamNames, oddsData, logos, gameDetails, gameIds, current
                   alt={`${teamNames[0]} logo`}
                   className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex-shrink-0"
                 />
-                <span className="whitespace-nowrap text-[0.75rem] sm:text-2xl md:text-3xl lg:text-4xl overflow-hidden overflow-ellipsis">
+                <span className="whitespace-nowrap text-[0.75rem] text-xl sm:text-2xl md:text-3xl lg:text-4xl overflow-hidden overflow-ellipsis">
                   {teamNames[0]} vs. {teamNames[1]}
                 </span>
                 <img

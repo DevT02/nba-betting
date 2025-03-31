@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { getTeamLogo } from "@/lib/teamNameMap";
 import { GamePreview } from "@/types/game";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type PreviewBannerProps = {
   direction: "left" | "right";
@@ -20,17 +21,32 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
   headerHeight = 80,
 }) => {
   const router = useRouter();
+  const [manuallyClosed, setManuallyClosed] = React.useState(false);
 
+  if (manuallyClosed) {
+    return (
+      <div className={`fixed ${direction}-0 top-1/2 transform -translate-y-1/2 z-40`}>
+        <button
+          onClick={() => setManuallyClosed(false)}
+          className="p-2 bg-gray-200 dark:bg-gray-800 rounded-full hover:bg-gray-300 dark:hover:bg-gray-700"
+        >
+          {direction === "right" ? <ChevronLeft /> : <ChevronRight />}
+        </button>
+      </div>
+    );
+  }
+
+  if (!previews.length) return null;
   const initialX = direction === "left" ? -50 : 50;
   const exitX = direction === "left" ? -100 : 100;
   const animate =
     mode === "open"
-      ? { x: 0, opacity: 1 }
+      ? { x: 0, opacity: 1, transition: { duration: 0.3 } }
       : mode === "peek"
       ? {
-          x: [initialX, direction === "left" ? -40 : 40, initialX],
+          x: direction === "left" ? -40 : 40,
           opacity: 1,
-          transition: { repeat: Infinity, duration: 1.5 },
+          transition: { ease: "easeInOut", duration: 1.5, yoyo: Infinity },
         }
       : {};
 
@@ -38,14 +54,24 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
     <AnimatePresence>
       {mode !== "hidden" && (
         <motion.div
-          key={`${direction}Banner`}
-          initial={{ x: initialX, opacity: 0 }}
-          animate={animate}
-          exit={{ x: exitX, opacity: 0, transition: { duration: 0.5 } }}
-          // Use headerHeight to set the top offset so the banner appears below the header.
-          style={{ top: `${headerHeight}px` }}
-          className={`fixed ${direction}-0 bottom-0 w-[300px] sm:w-1/4 bg-gray-100 dark:bg-gray-700 p-4 shadow-xl z-40 cursor-pointer`}
+        key={`${direction}Banner`}
+        initial={{ x: initialX, opacity: 0 }}
+        animate={animate}
+        exit={{ x: exitX, opacity: 0, transition: { duration: 0.5 } }}
+        style={{ top: `${headerHeight}px` }}
+        className={`fixed ${direction === "right" ? "right-0" : "left-0"} bottom-0 ${
+          direction === "right" ? "sm:max-w-[20%]" : "sm:max-w-[20%]"
+          } max-w-[350px] w-[90%] bg-gray-100 dark:bg-gray-900 p-4 shadow-xl z-40 cursor-pointer`}
         >
+          {/* Toggle button positioned at inner edge */}
+          <button
+            onClick={() => setManuallyClosed(true)}
+            className={`absolute top-1/2 transform -translate-y-1/2 ${
+              direction === "right" ? "left-[-20px]" : "right-[-20px]"
+            } p-2 bg-gray-200 dark:bg-gray-800 rounded-full hover:bg-gray-300 dark:hover:bg-gray-700`}
+          >
+            {direction === "right" ? <ChevronLeft /> : <ChevronRight />}
+          </button>
           <div className="flex flex-col space-y-4">
             {previews.map((preview) => {
               const gameTime = new Date(preview.commence_time);
@@ -63,9 +89,7 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
                         alt={`${preview.away_team} logo`}
                         className="w-6 h-6"
                       />
-                      <span className="text-sm font-semibold">
-                        {preview.away_team}
-                      </span>
+                      <span className="text-sm font-semibold">{preview.away_team}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-1">
                       <img
@@ -73,13 +97,9 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
                         alt={`${preview.home_team} logo`}
                         className="w-6 h-6"
                       />
-                      <span className="text-sm font-semibold">
-                        {preview.home_team}
-                      </span>
+                      <span className="text-sm font-semibold">{preview.home_team}</span>
                     </div>
-                    <p className="text-xs mt-1">
-                      {format(gameTime, "EEE, MMM d, h:mm a")}
-                    </p>
+                    <p className="text-xs mt-1">{format(gameTime, "EEE, MMM d, h:mm a")}</p>
                   </div>
                 </motion.div>
               );

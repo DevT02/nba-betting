@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { OddsRow } from "./GameDetails";
+import { OddsRow } from "@/types/game"; 
 import {
   Table,
   TableHeader,

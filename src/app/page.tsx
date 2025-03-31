@@ -1,4 +1,4 @@
-import Header from "../components/Header";
+import Header from "@/components/game/Header";
 import Link from "next/link";
 
 import { Clock, MapPin, Calendar } from "lucide-react";
@@ -8,29 +8,16 @@ import { addDays } from "date-fns";
 import { mergeArenaInfo } from "@/lib/mergeGameData"; 
 import { getEvResults, getUpcomingGames } from "@/lib/staticCache";
 import { getTeamLogo } from "@/lib/teamNameMap";
+import { deduplicateGames } from "@/lib/utils";
 
-import GamesGrid from "@/components/GamesGrid";
+import GamesGrid from "@/components/game/GamesGrid";
 import TimeZoneSync from '@/components/utils/TimeZoneSync';
 
 export default async function Home({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  function deduplicateGames(games: any[]) {
-    const seen = new Set();
-    const uniqueGames: any[] = [];
-  
-    for (const game of games) {
-      const key = `${game.home_team}-${game.away_team}-${game.commence_time}`;
-      if (!seen.has(key)) {
-        seen.add(key);
-        uniqueGames.push(game);
-      }
-    }
-    return uniqueGames;
-  }
-  
+}) {  
   const sp = await searchParams;
   const { tab, tz } = sp;
 

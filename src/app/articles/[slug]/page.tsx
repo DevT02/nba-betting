@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+import Header from "@/components/game/Header";
 import { articleData } from "@/components/ArticleData";
 import { notFound } from "next/navigation";
 export const dynamic = 'force-dynamic';

@@ -5,13 +5,14 @@ import { useRouter } from "next/navigation";
 import OddsTable from "./OddsTable";
 import Header from "./Header";
 import { FaTrophy } from "react-icons/fa";
-import { ClockIcon, MapPinIcon, TrendingUpIcon, AlertTriangleIcon } from "lucide-react";
+import { ClockIcon, MapPinIcon, TrendingUpIcon, AlertTriangleIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { useUserTimeZone } from "@/lib/timeZone";
 import PreviewBanner from "./PreviewBanner";
 import { useAdjacentGameNavigation } from "@/hooks/useAdjacentGameNavigation";
 import { usePreviewMode } from "@/hooks/usePreviewMode";
 import { GameDetailsProps } from "@/types/game";
 import { motion } from "framer-motion";
+import GameSelector from "./mobile/GameSelector";
 
 function GameDetails({teamNames, oddsData, logos, gameDetails, gameIds, currentGameId, gamePreviews}: GameDetailsProps) {
   const router = useRouter();
@@ -144,6 +145,14 @@ function GameDetails({teamNames, oddsData, logos, gameDetails, gameIds, currentG
   return (
     <div style={{ backgroundColor: "hsl(var(--background))", color: "hsl(var(--foreground))" }} className="min-h-screen">
       <Header />
+      {isMobile && gameIds && gamePreviews && (
+        <div className="px-4 sm:px-6 lg:px-8 mt-2">
+          <GameSelector 
+            games={gameIds.map(id => gamePreviews[id]).filter(Boolean)} 
+            currentGameId={currentGameId}
+          />
+        </div>
+      )}
       <main className="mx-auto px-4 sm:px-6 lg:px-8 mt-6 max-w-6xl">
         {isMobile ? (
           <motion.div
@@ -299,14 +308,34 @@ function GameDetails({teamNames, oddsData, logos, gameDetails, gameIds, currentG
             </Tabs>
           </div>
         )}
-        <div className="flex justify-between my-4" style={{ backgroundColor: "hsl(var(--background))" }}>
-          <button onClick={() => { if (prevId) router.push(`/gamedetails/${prevId}`); }} className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-200">
-            Previous
+        <div className="flex justify-between my-6">
+          <button
+            onClick={() => { if (prevId) router.push(`/gamedetails/${prevId}`); }}
+            disabled={!prevId}
+            className={`px-5 py-2.5 rounded-lg flex items-center gap-2 transition-colors ${
+              prevId 
+                ? "bg-card hover:bg-accent text-card-foreground border border-border" 
+                : "bg-muted text-muted-foreground cursor-not-allowed border border-border opacity-50"
+            }`}
+          >
+            <ChevronLeft className="h-5 w-5" />
+            <span className="font-medium">Previous</span>
           </button>
-          <button onClick={() => { if (nextId) router.push(`/gamedetails/${nextId}`); }} className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-200">
-            Next
+          
+          <button
+            onClick={() => { if (nextId) router.push(`/gamedetails/${nextId}`); }}
+            disabled={!nextId}
+            className={`px-5 py-2.5 rounded-lg flex items-center gap-2 transition-colors ${
+              nextId 
+                ? "bg-card hover:bg-accent text-card-foreground border border-border" 
+                : "bg-muted text-muted-foreground cursor-not-allowed border border-border opacity-50"
+            }`}
+          >
+            <span className="font-medium">Next</span>
+            <ChevronRight className="h-5 w-5" />
           </button>
         </div>
+
         {/* Only render preview banners on non-mobile */}
         {!isMobile && (
           <>
@@ -314,9 +343,10 @@ function GameDetails({teamNames, oddsData, logos, gameDetails, gameIds, currentG
             <PreviewBanner direction="right" previews={nextPreviews} mode={rightBannerMode} headerHeight={headerHeight} />
           </>
         )}
-        <div className="mt-8 p-4 bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-900 dark:to-blue-800 border border-blue-500 dark:border-blue-700 rounded-lg shadow-xl flex items-center justify-center">
-          <p className="text-center text-[0.75rem] sm:text-base font-bold text-white">
-            AI Prediction: <span className="underline">{bestTeam}</span> is most likely to win!
+        <div className="mt-8 p-4 bg-card border border-border rounded-lg shadow-sm flex items-center justify-center">
+          <p className="text-center text-[0.75rem] sm:text-base font-medium text-card-foreground">
+            <span className="font-bold">AI Prediction:</span>{" "}
+            <span className="underline text-primary">{bestTeam}</span> is most likely to win!
           </p>
         </div>
       </main>

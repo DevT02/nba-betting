@@ -8,7 +8,7 @@ export const casinoLogos: CasinoLogoMap = {
   "fliff": "/casinos/fliff-logo-small.jpeg",
   "betmgm": "/casinos/betmgm-logo-small.svg",
   "betrivers": "/casinos/betrivers-logo-small.svg",
-  "espnbet": "/casinos/fanduel-logo-small.svg",
+  "espnbet": "/casinos/espnbet-logo-small.svg",
   "draftkings": "/casinos/draftkings-logo-small.svg",
 };
 

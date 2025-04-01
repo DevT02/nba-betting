@@ -53,16 +53,20 @@ const OddsTable = ({ oddsData }: OddsTableProps) => {
                       }}
                     >
                       <TableCell className="py-3 font-medium">
-                        <div className="flex items-center gap-2">
-                          <div className="relative w-6 h-6 bg-white rounded-full overflow-hidden shadow-sm flex-shrink-0">
+                        <div className="flex items-center gap-3">
+                          <div className="relative w-8 h-8 flex items-center justify-center bg-card border border-border/50 rounded-md overflow-hidden shadow-sm flex-shrink-0">
                             <img 
                               src={getCasinoLogo(row.book)} 
                               alt={`${row.book} logo`}
-                              className="w-full h-full object-contain p-0.5" 
+                              className="max-w-full max-h-full object-contain p-1" 
+                              onError={(e) => {
+                                e.currentTarget.src = "/images/casinos/generic-casino.svg";
+                              }}
                             />
                           </div>
+                          <span className="text-sm font-medium">{row.book}</span>
                         </div>
-                      </TableCell>                   
+                      </TableCell>                 
                       <TableCell className="py-3 font-medium">{row.moneyline}</TableCell>
                       <TableCell className="py-3 font-medium">{row.probability}</TableCell>
                       <TableCell className={`py-3 font-medium ${edgeColorClass}`}>

@@ -219,18 +219,43 @@ function GameDetails({teamNames, oddsData, logos, gameDetails, gameIds, currentG
                 <span className="text-xs">({oddsData[bestTeam][0]?.probability ?? "N/A"} probability)</span>
               </div>
               <Tabs defaultValue={teamNames[0]}>
-                <TabsList className="flex justify-center space-x-3 mb-4">
+                <TabsList className="mx-auto mb-3 bg-card/80 border border-border/30 shadow-sm rounded-lg
+                  w-fit
+                  flex
+                  gap-1
+                ">
                   {teamNames.map((team) => (
-                    <TabsTrigger key={team} value={team} className="text-xs">
-                      {team}
+                    <TabsTrigger
+                      key={team}
+                      value={team}
+                      className="relative min-w-[100px] px-3 py-1.5 text-sm font-medium transition-all duration-200
+                                data-[state=active]:bg-transparent 
+                                data-[state=active]:text-foreground
+                                data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground/80"
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <div className="relative w-4 h-4 flex items-center justify-center rounded overflow-hidden">
+                          <img
+                            src={logos?.[team] ?? getTeamLogo(team)}
+                            alt={`${team} logo`}
+                            className="w-3.5 h-3.5 object-contain"
+                          />
+                        </div>
+                        <span>{team}</span>
+                      </div>
+                      <div className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-primary
+                                      scale-x-0 transition-transform duration-200
+                                      data-[state=active]:scale-x-100" />
                     </TabsTrigger>
                   ))}
                 </TabsList>
                 {teamNames.map((team) => (
-                  <TabsContent key={team} value={team}>
-                    <div className="overflow-x-auto">
-                      <OddsTable oddsData={oddsData[team]} />
-                    </div>
+                  <TabsContent
+                    key={team}
+                    value={team}
+                    className="outline-none focus-visible:ring-0 focus-visible:ring-transparent"
+                  >
+                    <OddsTable oddsData={oddsData[team]} />
                   </TabsContent>
                 ))}
               </Tabs>
@@ -291,18 +316,43 @@ function GameDetails({teamNames, oddsData, logos, gameDetails, gameIds, currentG
               </div>
             </div>
             <Tabs defaultValue={teamNames[0]}>
-              <TabsList className="flex justify-center space-x-3 mb-4">
-                {teamNames.map(team => (
-                  <TabsTrigger key={team} value={team} className="text-xs">
-                    {team}
+              <TabsList className="mx-auto mb-3 bg-card/80 border border-border/30 shadow-sm rounded-lg
+                w-fit
+                flex
+                gap-1
+              ">
+                {teamNames.map((team) => (
+                  <TabsTrigger
+                    key={team}
+                    value={team}
+                    className="relative min-w-[100px] px-3 py-1.5 text-sm font-medium transition-all duration-200
+                              data-[state=active]:bg-transparent 
+                              data-[state=active]:text-foreground
+                              data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground/80"
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <div className="relative w-4 h-4 flex items-center justify-center rounded overflow-hidden">
+                        <img
+                          src={logos?.[team] ?? getTeamLogo(team)}
+                          alt={`${team} logo`}
+                          className="w-3.5 h-3.5 object-contain"
+                        />
+                      </div>
+                      <span>{team}</span>
+                    </div>
+                    <div className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-primary
+                                    scale-x-0 transition-transform duration-200
+                                    data-[state=active]:scale-x-100" />
                   </TabsTrigger>
                 ))}
               </TabsList>
-              {teamNames.map(team => (
-                <TabsContent key={team} value={team}>
-                  <div className="overflow-x-auto">
-                    <OddsTable oddsData={oddsData[team]} />
-                  </div>
+              {teamNames.map((team) => (
+                <TabsContent
+                  key={team}
+                  value={team}
+                  className="outline-none focus-visible:ring-0 focus-visible:ring-transparent"
+                >
+                  <OddsTable oddsData={oddsData[team]} />
                 </TabsContent>
               ))}
             </Tabs>

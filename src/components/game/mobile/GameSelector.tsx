@@ -46,9 +46,9 @@ const GameSelector = ({ games, currentGameId }: GameSelectorProps) => {
               onClick={() => router.push(`/gamedetails/${game._id}`)}
               className={`flex-shrink-0 flex items-center gap-1 mx-1 px-3 py-2 rounded-full border snap-center whitespace-nowrap
                 ${isCurrentGame 
-                  ? "bg-blue-500 text-white border-blue-600" 
-                  : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-                }`}
+                  ? "bg-accent/80 text-accent-foreground border-primary/50 shadow-sm" 
+                  : "bg-card hover:bg-accent/30 text-card-foreground border-border/60"
+              }`}
             >
               <div className="flex items-center gap-1.5">
                 <img 
@@ -71,8 +71,8 @@ const GameSelector = ({ games, currentGameId }: GameSelectorProps) => {
                   {game.home_team.split(' ').pop()}
                 </span>
               </div>
-              <span className="text-[10px] ml-1">
-                {format(gameTime, "h:mm a")}
+              <span className="text-[10px] ml-1 opacity-70">
+                {format(gameTime, 'h:mm a')}
               </span>
             </button>
           );

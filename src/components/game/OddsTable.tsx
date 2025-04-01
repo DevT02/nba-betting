@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { OddsRow } from "@/types/game"; 
 import {
   Table,
@@ -11,12 +11,77 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { getCasinoLogo } from "@/lib/casinoLogoMap";
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 type OddsTableProps = {
   oddsData: OddsRow[];
 };
 
+type SortColumn = 'book' | 'moneyline' | 'probability' | 'edge';
+type SortDirection = 'asc' | 'desc';
+
 const OddsTable = ({ oddsData }: OddsTableProps) => {
+  const [sortedData, setSortedData] = useState<OddsRow[]>([]);
+  const [sortColumn, setSortColumn] = useState<SortColumn>('edge');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+
+  useEffect(() => {
+    if (!oddsData) {
+      setSortedData([]);
+      return;
+    }
+    const dataToSort = [...oddsData];
+    const sorted = dataToSort.sort((a, b) => {
+      let valueA, valueB;
+      switch (sortColumn) {
+        case 'book':
+          valueA = a.book.toLowerCase();
+          valueB = b.book.toLowerCase();
+          return sortDirection === 'asc' 
+            ? valueA.localeCompare(valueB)
+            : valueB.localeCompare(valueA);
+        case 'moneyline':
+          valueA = parseInt(a.moneyline.replace(/[+\-]/g, ''));
+          valueB = parseInt(b.moneyline.replace(/[+\-]/g, ''));
+          if (a.moneyline.startsWith('-') && !b.moneyline.startsWith('-')) {
+            return sortDirection === 'asc' ? -1 : 1;
+          } 
+          if (!a.moneyline.startsWith('-') && b.moneyline.startsWith('-')) {
+            return sortDirection === 'asc' ? 1 : -1;
+          }
+          return sortDirection === 'asc' ? valueA - valueB : valueB - valueA;
+        case 'probability':
+          valueA = parseFloat(a.probability.replace('%', ''));
+          valueB = parseFloat(b.probability.replace('%', ''));
+          return sortDirection === 'asc' ? valueA - valueB : valueB - valueA;
+        case 'edge':
+          valueA = parseFloat(a.edge);
+          valueB = parseFloat(b.edge);
+          return sortDirection === 'asc' ? valueA - valueB : valueB - valueA;   
+        default:
+          return 0;
+      }
+    });
+    
+    setSortedData(sorted);
+  }, [oddsData, sortColumn, sortDirection]);
+
+  const handleSort = (column: SortColumn) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection(column === 'edge' || column === 'probability' ? 'desc' : 'asc');
+    }
+  };
+  
+  const renderSortIcon = (column: SortColumn) => {
+    if (sortColumn !== column) return null;
+    return sortDirection === 'asc' 
+      ? <ChevronUp className="inline h-4 w-4 ml-1" /> 
+      : <ChevronDown className="inline h-4 w-4 ml-1" />;
+  };
+
   return (
     <div className="mt-6 overflow-hidden border border-border rounded-lg bg-card">
       <div className="relative min-h-[280px] max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent hover:scrollbar-thumb-muted/80">
@@ -24,15 +89,39 @@ const OddsTable = ({ oddsData }: OddsTableProps) => {
           <Table className="w-full text-sm">
             <TableHeader className="sticky top-0 z-10 bg-gradient-to-r from-background to-primary/5">
               <TableRow className="border-b border-border bg-card hover:bg-card">
-                <TableHead className="w-1/4 font-medium text-foreground" style={{minWidth: '100px'}}>Casino</TableHead>
-                <TableHead className="w-1/4 font-medium text-foreground" style={{minWidth: '100px'}}>Moneyline</TableHead>
-                <TableHead className="w-1/4 font-medium text-foreground" style={{minWidth: '120px'}}>Win Probability</TableHead>
-                <TableHead className="w-1/4 font-medium text-foreground" style={{minWidth: '80px'}}>Edge</TableHead>
+                <TableHead 
+                  className="w-1/4 font-medium text-foreground cursor-pointer"
+                  style={{minWidth: '100px'}}
+                  onClick={() => handleSort('book')}
+                >
+                  Casino {renderSortIcon('book')}
+                </TableHead>
+                <TableHead 
+                  className="w-1/4 font-medium text-foreground cursor-pointer"
+                  style={{minWidth: '100px'}}
+                  onClick={() => handleSort('moneyline')}
+                >
+                  Moneyline {renderSortIcon('moneyline')}
+                </TableHead>
+                <TableHead 
+                  className="w-1/4 font-medium text-foreground cursor-pointer"
+                  style={{minWidth: '120px'}}
+                  onClick={() => handleSort('probability')}
+                >
+                  Win Probability {renderSortIcon('probability')}
+                </TableHead>
+                <TableHead 
+                  className="w-1/4 font-medium text-foreground cursor-pointer"
+                  style={{minWidth: '80px'}}
+                  onClick={() => handleSort('edge')}
+                >
+                  Edge {renderSortIcon('edge')}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {oddsData && oddsData.length > 0 ? (
-                oddsData.map((row, idx) => {
+              {sortedData && sortedData.length > 0 ? (
+                sortedData.map((row, idx) => {
                   const edgeValue = parseFloat(row.edge);
                   const edgeColorClass = edgeValue > 0 
                     ? "text-emerald-600 dark:text-emerald-400" 

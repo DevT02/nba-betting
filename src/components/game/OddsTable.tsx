@@ -25,6 +25,11 @@ const OddsTable = ({ oddsData }: OddsTableProps) => {
   const [sortColumn, setSortColumn] = useState<SortColumn>('edge');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
+  const bestEdgeRow = React.useMemo(() => {
+    if (!sortedData?.length) return null;
+    return [...sortedData].sort((a, b) => parseFloat(b.edge) - parseFloat(a.edge))[0];
+  }, [sortedData]);
+
   useEffect(() => {
     if (!oddsData) {
       setSortedData([]);
@@ -83,10 +88,9 @@ const OddsTable = ({ oddsData }: OddsTableProps) => {
   };
 
   return (
-    <div className="mt-6 overflow-hidden border border-border rounded-lg bg-card">
+    <div className="mt-6 overflow-hidden border border-border/30 rounded-lg bg-card/80 shadow-sm">
       <div className="relative min-h-[280px] max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent hover:scrollbar-thumb-muted/80">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 opacity-50 pointer-events-none"></div>
-          <Table className="w-full text-sm">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 opacity-50 pointer-events-none"></div>          <Table className="w-full text-sm">
             <TableHeader className="sticky top-0 z-10 bg-gradient-to-r from-background to-primary/5">
               <TableRow className="border-b border-border bg-card hover:bg-card">
                 <TableHead 
@@ -111,8 +115,8 @@ const OddsTable = ({ oddsData }: OddsTableProps) => {
                   Win Probability {renderSortIcon('probability')}
                 </TableHead>
                 <TableHead 
-                  className="w-1/4 font-medium text-foreground cursor-pointer"
-                  style={{minWidth: '80px'}}
+                  className="w-1/4 font-medium text-foreground cursor-pointer relative group px-4"
+                  style={{minWidth: '100px'}}
                   onClick={() => handleSort('edge')}
                 >
                   Edge {renderSortIcon('edge')}
@@ -131,7 +135,9 @@ const OddsTable = ({ oddsData }: OddsTableProps) => {
                   return (
                     <TableRow
                       key={idx}
-                      className="border-b border-border last:border-0 hover:bg-muted/30 transition-all duration-200"
+                      className={`border-b border-border last:border-0 hover:bg-muted/30 transition-all duration-200 ${
+                        edgeValue > 3 ? "bg-emerald-50/30 dark:bg-emerald-950/10" : ""
+                      }`}
                       style={{
                         animationDelay: `${idx * 50}ms`,
                         animationName: 'fadeIn',
@@ -174,7 +180,12 @@ const OddsTable = ({ oddsData }: OddsTableProps) => {
                             </div>
                           )}
                           <span>{row.edge}</span>
-                        </div>
+                          {bestEdgeRow && row.book === bestEdgeRow.book && (
+                            <span className="ml-2 inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 text-xs font-medium text-amber-800 dark:text-amber-300">
+                              Best
+                            </span>
+                          )}                        
+                          </div>
                       </TableCell>
                     </TableRow>
                   );

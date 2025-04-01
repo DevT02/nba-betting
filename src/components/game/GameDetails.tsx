@@ -169,8 +169,8 @@ function GameDetails({teamNames, oddsData, logos, gameDetails, gameIds, currentG
             <div className="flex flex-col items-center gap-4 mb-4">
               <h1 className="font-bold text-center">
                 <div className="flex items-center justify-center gap-2 sm:gap-4 flex-nowrap">
-                  <img src={logoLeft} alt={`${teamNames[0]} logo`} className="w-8 h-8" />
-                  <span className="whitespace-nowrap text-base sm:text-xl md:text-2xl lg:text-3xl overflow-hidden overflow-ellipsis">
+                <img src={logoLeft} alt={`${teamNames[0]} logo`} className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <span className="whitespace-nowrap text-base sm:text-md md:text-2xl lg:text-3xl overflow-hidden overflow-ellipsis">
                     {teamNames[0]} vs. {teamNames[1]}
                   </span>
                   <img src={logoRight} alt={`${teamNames[1]} logo`} className="w-8 h-8" />

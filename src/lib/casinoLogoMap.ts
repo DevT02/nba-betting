@@ -3,11 +3,12 @@ type CasinoLogoMap = {
 };
 
 export const casinoLogos: CasinoLogoMap = {
-  "DraftKings": "/images/casinos/draftkings.svg",
+  "draftkings": "/images/casinos/draftkings.svg",
   "FanDuel": "/images/casinos/fanduel.svg",
   "BetMGM": "/images/casinos/betmgm.svg",
   "Caesars": "/images/casinos/caesars.svg",
   "PointsBet": "/images/casinos/pointsbet.svg",
+  "betonlineag": "/images/casinos/betonlinelogo.svg", 
 };
 
 export function getCasinoLogo(casinoName: string): string {

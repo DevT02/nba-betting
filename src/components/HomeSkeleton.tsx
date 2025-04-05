@@ -12,7 +12,7 @@ export default function HomeSkeleton() {
       <header
         className="w-full border-b p-5 px-8 shadow-md flex items-center justify-between font-nfl"
         style={{
-          backgroundColor: "hsl(var(--card))", // Matches your header bg in production
+          backgroundColor: "hsl(var(--card))",
           letterSpacing: "0.25em",
         }}
       >

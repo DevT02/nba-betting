@@ -1,7 +1,6 @@
 import Header from "@/components/game/Header";
 import Link from "next/link";
 
-import { Clock, MapPin, Calendar } from "lucide-react";
 import { formatInTimeZone } from "date-fns-tz";
 import { addDays } from "date-fns";
 

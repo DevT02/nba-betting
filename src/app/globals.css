@@ -85,3 +85,11 @@
     transform: translateY(0);
   }
 }
+
+html.dark {
+  color-scheme: dark;
+}
+
+.theme-transitioning * {
+  transition: none !important;
+}

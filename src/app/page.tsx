@@ -10,6 +10,7 @@ import { getTeamLogo } from "@/lib/teamNameMap";
 import { deduplicateGames } from "@/lib/utils";
 
 import GamesGrid from "@/components/game/GamesGrid";
+import GamesGridWrapper from "@/components/game/GamesGridWrapper";
 import TimeZoneSync from '@/components/utils/TimeZoneSync';
 
 export default async function Home({
@@ -110,7 +111,7 @@ export default async function Home({
           ))}
         </div>
 
-        <GamesGrid games={games} activeTab={activeTab} />
+        <GamesGridWrapper games={games} activeTab={activeTab} />
       </div>
     </div>
   );

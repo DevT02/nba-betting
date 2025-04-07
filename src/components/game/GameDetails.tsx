@@ -290,42 +290,75 @@ function GameDetails({
                 {/* Simplified team comparison */}
                 <div className="w-full bg-white/50 dark:bg-black/10 rounded-lg p-2.5 relative">
                   {/* Teams and logos row */}
-                  <div className="flex justify-between items-center mb-3">
-                    {teamNames.map((team, index) => {
-                      const probability = parseFloat(oddsData[team][0]?.probability?.replace("%", "") || "0");
-                      const isWinner = team === bestTeam;
-                      const isRightTeam = index === 1; // Second team in the array
-                      
-                      return (
-                        <div key={team} className={`flex items-center gap-2 ${isRightTeam ? 'flex-row-reverse' : ''}`}>
-                          <div className={`w-7 h-7 rounded-full p-1 flex items-center justify-center shadow-sm ${
-                            isWinner 
-                              ? "bg-green-100 dark:bg-green-900/30 ring-1 ring-green-200 dark:ring-green-900/50" 
-                              : "bg-red-100 dark:bg-red-900/30 ring-1 ring-red-200 dark:ring-red-900/50"
-                          }`}>
-                            <img 
-                              src={logos?.[team] ?? getTeamLogo(team)}
-                              alt={`${team} logo`}
-                              className="w-full h-full object-contain"
-                            />
-                          </div>
-                          <div>
-                            <div className="font-medium text-xs">
-                              {getShortTeamName(team)}
-                            </div>
-                            <div className={`text-xs font-semibold ${
-                              isWinner 
-                                ? "text-green-600 dark:text-green-400" 
-                                : "text-red-600 dark:text-red-400"
-                            } ${isRightTeam ? 'text-right' : 'text-left'}`}>
-                              {oddsData[team][0]?.probability || "N/A"}
-                            </div>
-                          </div>
+                  <div className="flex justify-between items-center mb-3 relative">
+                    {/* Left team */}
+                    <div className="flex items-center gap-2">
+                      <div className={`w-7 h-7 rounded-full p-1 flex items-center justify-center shadow-sm ${
+                        teamNames[0] === bestTeam
+                          ? "bg-green-100 dark:bg-green-900/30 ring-1 ring-green-200 dark:ring-green-900/50" 
+                          : "bg-red-100 dark:bg-red-900/30 ring-1 ring-red-200 dark:ring-red-900/50"
+                      }`}>
+                        <img 
+                          src={logos?.[teamNames[0]] ?? getTeamLogo(teamNames[0])}
+                          alt={`${teamNames[0]} logo`}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      <div>
+                        <div className="font-medium text-xs">
+                          {getShortTeamName(teamNames[0])}
                         </div>
-                      );
-                    })}
-                  </div>                  
-                  {/* Compact progress bar */}
+                        <div className={`text-xs font-semibold ${
+                          teamNames[0] === bestTeam
+                            ? "text-green-600 dark:text-green-400" 
+                            : "text-red-600 dark:text-red-400"
+                        }`}>
+                          {oddsData[teamNames[0]][0]?.probability || "N/A"}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* VS marker in the middle */}
+                    <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                      <div className="bg-gradient-to-b from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 
+                                    rounded-full h-5 w-5 flex items-center justify-center shadow-md 
+                                    border-2 border-yellow-100 dark:border-yellow-900/50">
+                        <span className="text-[9px] font-extrabold bg-clip-text text-transparent 
+                                      bg-gradient-to-br from-yellow-500 to-orange-500 
+                                      dark:from-yellow-300 dark:to-yellow-500">
+                          VS
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Right team */}
+                    <div className="flex items-center gap-2 flex-row-reverse">
+                      <div className={`w-7 h-7 rounded-full p-1 flex items-center justify-center shadow-sm ${
+                        teamNames[1] === bestTeam
+                          ? "bg-green-100 dark:bg-green-900/30 ring-1 ring-green-200 dark:ring-green-900/50" 
+                          : "bg-red-100 dark:bg-red-900/30 ring-1 ring-red-200 dark:ring-red-900/50"
+                      }`}>
+                        <img 
+                          src={logos?.[teamNames[1]] ?? getTeamLogo(teamNames[1])}
+                          alt={`${teamNames[1]} logo`}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      <div>
+                        <div className="font-medium text-xs text-right">
+                          {getShortTeamName(teamNames[1])}
+                        </div>
+                        <div className={`text-xs font-semibold text-right ${
+                          teamNames[1] === bestTeam
+                            ? "text-green-600 dark:text-green-400" 
+                            : "text-red-600 dark:text-red-400"
+                        }`}>
+                          {oddsData[teamNames[1]][0]?.probability || "N/A"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden relative shadow-inner">
                     {teamNames.map(team => {
                       const probability = parseFloat(oddsData[team][0]?.probability?.replace("%", "") || "0");
@@ -345,15 +378,8 @@ function GameDetails({
                         />
                       );
                     })}
-                    
-                    {/* VS marker in the middle - improved */}
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-                      <div className="bg-gradient-to-b from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 rounded-full h-5 w-5 flex items-center justify-center shadow-md border-2 border-yellow-100 dark:border-yellow-900/50">
-                        <span className="text-[9px] font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-yellow-500 to-orange-500 dark:from-yellow-300 dark:to-yellow-500">VS</span>
-                      </div>
-                    </div>
                   </div>
-                  
+
                   {/* Status labels positioned at far ends under the progress bar */}
                   <div className="flex justify-between mt-2">
                     {teamNames.map(team => {
@@ -512,10 +538,9 @@ function GameDetails({
                   </h3>
                 </div>
                 
-                {/* Simplified team comparison */}
                 <div className="w-full bg-white/50 dark:bg-black/10 rounded-lg p-2.5 sm:p-3 relative">
                   {/* Teams and logos row */}
-                  <div className="flex justify-between items-center mb-3">
+                  <div className="flex justify-between items-center mb-3 relative">
                     {teamNames.map((team, index) => {
                       const probability = parseFloat(oddsData[team][0]?.probability?.replace("%", "") || "0");
                       const isWinner = team === bestTeam;
@@ -544,14 +569,27 @@ function GameDetails({
                                 ? "text-green-600 dark:text-green-400" 
                                 : "text-red-600 dark:text-red-400"
                             } ${isRightTeam ? 'text-right' : 'text-left'}`}>
-                             {oddsData[team][0]?.probability || "N/A"}
+                            {oddsData[team][0]?.probability || "N/A"}
                             </div>
                           </div>
                         </div>
                       );
                     })}
-                  </div>                  
-                  {/* Compact progress bar */}
+                    
+                    {/* VS marker in the middle */}
+                    <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                      <div className="bg-gradient-to-b from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 
+                                    rounded-full h-5 w-5 sm:h-6 sm:w-6 flex items-center justify-center shadow-md 
+                                    border-2 border-yellow-100 dark:border-yellow-900/50">
+                        <span className="text-[9px] sm:text-[10px] font-extrabold bg-clip-text text-transparent 
+                                      bg-gradient-to-br from-yellow-500 to-orange-500 
+                                      dark:from-yellow-300 dark:to-yellow-500">
+                          VS
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
                   <div className="h-3 sm:h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden relative shadow-inner">
                     {teamNames.map(team => {
                       const probability = parseFloat(oddsData[team][0]?.probability?.replace("%", "") || "0");
@@ -588,12 +626,6 @@ function GameDetails({
                       );
                     })}
                     
-                    {/* VS marker in the middle */}
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-                      <div className="bg-gradient-to-b from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 rounded-full h-5 w-5 sm:h-6 sm:w-6 flex items-center justify-center shadow-md border-2 border-yellow-100 dark:border-yellow-900/50">
-                        <span className="text-[9px] sm:text-[10px] font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-yellow-500 to-orange-500 dark:from-yellow-300 dark:to-yellow-500">VS</span>
-                      </div>
-                    </div>
                   </div>
                   
                   {/* Status labels positioned at far ends under the progress bar */}

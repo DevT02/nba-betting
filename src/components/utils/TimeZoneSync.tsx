@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useUserTimeZone } from "@/lib/timeZone";
+import { useUserTimeZone } from "@/hooks/useUserTimeZone"; 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 export default function TimeZoneSync() {
@@ -12,7 +12,9 @@ export default function TimeZoneSync() {
 
   useEffect(() => {
     if (!userTimeZone) return;
+
     const params = new URLSearchParams(searchParams?.toString() || "");
+
     if (!params.has("tz")) {
       params.set("tz", userTimeZone);
       router.replace(`${pathname}?${params.toString()}`);

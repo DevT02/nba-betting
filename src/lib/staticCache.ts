@@ -1,8 +1,11 @@
 import { connectToDatabase } from './mongodb';
+import { deduplicateGames } from "@/lib/utils";
+import { GamePreview } from "@/types/game";
 
 let evResultsCache: { data: any[]; timestamp: number } | null = null;
 let upcomingGamesCache: any[] | null = null;
 let gamesCache: any[] | null = null;
+let adjacentGamesCache: { gamePreviews: Record<string, GamePreview>; gameIds: string[] } | null = null;
 
 // TTL for ev_results, 2 hours
 const TTL = 2 * 60 * 60 * 1000;
@@ -44,4 +47,32 @@ export async function getGames() {
   const { db } = await connectToDatabase();
   gamesCache = await db.collection("games").find({}).toArray();
   return gamesCache;
+}
+
+/**
+ * Gets adjacent games from the ev_results collection, deduplicates them,
+ * and returns a record of game previews and their IDs.
+ * @returns { gamePreviews: Record<string, GamePreview>; gameIds: string[] } - A record of game previews and their IDs.
+ * The game previews are deduplicated based on the game ID, and the IDs are returned as an array.
+ */
+export async function getAdjacentGames() {
+  if (adjacentGamesCache) return adjacentGamesCache;
+  
+  const evResults = await getEvResults();
+  const uniqueGameRecords = deduplicateGames(evResults);
+  
+  const gamePreviews: Record<string, GamePreview> = {};
+  uniqueGameRecords.forEach((game) => {
+    const id = game._id.toString();
+    gamePreviews[id] = {
+      _id: id,
+      home_team: game.home_team,
+      away_team: game.away_team,
+      commence_time: game.commence_time,
+    };
+  });
+  
+  const gameIds = uniqueGameRecords.map((game) => game._id.toString());
+  adjacentGamesCache = { gamePreviews, gameIds };
+  return adjacentGamesCache;
 }

@@ -233,7 +233,7 @@ function GameDetails({
                   </h1>
                 </div>
               </h1>
-              <div className="flex flex-wrap items-center justify-center gap-1">
+              <div className="flex flex-wrap items-center justify-center gap-2">
                 <div className="flex items-center gap-1 border border-gray-200 dark:border-gray-700 px-2 py-1 rounded-full">
                   <CalendarIcon className="h-4 w-4 text-indigo-500" />
                   <span className="text-xs">{formattedDate}</span>

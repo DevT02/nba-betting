@@ -12,6 +12,7 @@ import {
   AlertTriangleIcon,
   ChevronLeft,
   ChevronRight,
+  CalendarIcon,
 } from "lucide-react";
 import { useUserTimeZone } from "@/lib/timeZone";
 import PreviewBanner from "./PreviewBanner";
@@ -42,6 +43,13 @@ function GameDetails({
     timeZoneName: "short",
   }).format(eventTime);
 
+  const formattedDate = new Intl.DateTimeFormat(undefined, {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: userTimeZone,
+  }).format(eventTime);
+
   const bestTeam = React.useMemo(() => {
     return teamNames.reduce((prev, curr) => {
       const currProb =
@@ -62,7 +70,6 @@ function GameDetails({
   const currentIndex: number =
     gameIds && currentGameId ? gameIds.indexOf(currentGameId) : -1;
 
-  // Extend slices to include up to 7 items.
   const prevPreviews =
     gameIds && currentIndex > 0
       ? gameIds
@@ -78,7 +85,6 @@ function GameDetails({
           .filter((preview): preview is any => Boolean(preview))
       : [];
 
-  // Measure header height dynamically.
   const [headerHeight, setHeaderHeight] = useState(80);
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -91,7 +97,6 @@ function GameDetails({
 
   const { leftBannerMode, rightBannerMode } = usePreviewMode();
 
-  // Scroll handling for H2H info.
   const [showLeftGradient, setShowLeftGradient] = useState(false);
   const [showRightGradient, setShowRightGradient] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -117,7 +122,6 @@ function GameDetails({
     };
   }, []);
 
-  // Mobile detection and swipe functionality.
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -128,7 +132,6 @@ function GameDetails({
     }
   }, []);
 
-  // Detect large screens (e.g. 4K) to always show preview banners.
   const [isLargeScreen, setIsLargeScreen] = useState(false);
   useEffect(() => {
     const handleResize = () => setIsLargeScreen(window.innerWidth >= 1800);
@@ -137,7 +140,6 @@ function GameDetails({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // For mobile swiping, store the window width in state.
   const [windowWidth, setWindowWidth] = useState(768);
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -208,7 +210,7 @@ function GameDetails({
           >
             <div className="flex flex-col items-center gap-4 mb-4">
               <h1 className="font-bold text-center">
-                <div className="flex flex-col items-center gap-6 mb-8">
+                <div className="flex flex-col items-center gap-6 mb-1">
                   <h1 className="font-bold text-center">
                     <div className="flex items-center justify-center gap-2 sm:gap-4 flex-nowrap">
                       <img
@@ -232,6 +234,10 @@ function GameDetails({
                 </div>
               </h1>
               <div className="flex flex-wrap items-center justify-center gap-1">
+                <div className="flex items-center gap-1 border border-gray-200 dark:border-gray-700 px-2 py-1 rounded-full">
+                  <CalendarIcon className="h-4 w-4 text-indigo-500" />
+                  <span className="text-xs">{formattedDate}</span>
+                </div>
                 <div className="flex items-center gap-1 border border-gray-200 dark:border-gray-700 px-2 py-1 rounded-full">
                   <ClockIcon className="h-4 w-4 text-red-500" />
                   <span className="text-xs">{formattedTime}</span>
@@ -463,7 +469,7 @@ function GameDetails({
           >
             <div className="flex flex-col items-center gap-6 mb-8">
               <h1 className="font-bold text-center">
-                <div className="flex flex-col items-center gap-6 mb-8">
+                <div className="flex flex-col items-center gap-6 mb-1">
                   <h1 className="font-bold text-center">
                     <div className="flex items-center justify-center gap-2 sm:gap-4 flex-nowrap">
                       <img
@@ -487,6 +493,10 @@ function GameDetails({
                 </div>
               </h1>
               <div className="flex flex-wrap items-center justify-center gap-3 text-xs sm:text-sm">
+                <div className="flex items-center gap-2 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-full">
+                  <CalendarIcon className="h-4 w-4 text-indigo-500" />
+                  <span className="font-medium">{formattedDate}</span>
+                </div>
                 <div className="flex items-center gap-2 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-full">
                   <ClockIcon className="h-4 w-4 text-red-500" />
                   <span className="font-medium">{formattedTime}</span>

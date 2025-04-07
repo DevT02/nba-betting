@@ -4,13 +4,17 @@ import GameDetails from "@/components/game/GameDetails";
 import { GameDetailsPageProps } from "@/types/gameDetails";
 
 import { mergeArenaInfo } from "@/lib/mergeGameData";
-import { getUpcomingGames, getEvResults } from "@/lib/staticCache";
+import { getUpcomingGames, getEvResults, getAdjacentGames } from "@/lib/staticCache";
 import { connectToDatabase } from "@/lib/mongodb";
 import { getTeamLogo } from "@/lib/teamNameMap";
 import { deduplicateGames } from "@/lib/utils"; 
 
 import { GamePreview } from "@/types/game";
 
+function formatMoneyline(value: number | string): string {
+  const num = typeof value === "string" ? parseFloat(value) : value;
+  return num > 0 ? `+${num}` : `${num}`;
+}
 
 export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
   if (!id) {
@@ -25,28 +29,22 @@ export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
 
   const upcomingGames = await getUpcomingGames();
   const mergedGameRecord = await mergeArenaInfo(baseGameRecord, upcomingGames);
-  mergedGameRecord._id = mergedGameRecord._id.toString(); // plain object ID for JSON serialization.. sucks i guess
+  mergedGameRecord._id = mergedGameRecord._id.toString(); // plain object ID for JSON serialization
 
   const { home_team, away_team, commence_time } = mergedGameRecord;
   const gameRecords = await db.collection("ev_results")
     .find({ home_team, away_team, commence_time })
     .toArray();
 
-  const evResults = await getEvResults();
-  const uniqueGameRecords = deduplicateGames(evResults);
-  const gamePreviews: Record<string, GamePreview> = {};
-  uniqueGameRecords.forEach((game) => {
-    const id = game._id.toString();
-    gamePreviews[id] = {_id: id, home_team: game.home_team, away_team: game.away_team, commence_time: game.commence_time};
-  });
-  const gameIds = uniqueGameRecords.map((game) => game._id.toString());
-  
+  // Use cached adjacent games for previous/next navigation.
+  const { gamePreviews, gameIds } = await getAdjacentGames();
+
   const bookmakers = gameRecords.map((record) => ({
     book: record.bookmaker,
-    home_moneyline: record.home_odds.toString(),
+    home_moneyline: formatMoneyline(record.home_odds),
     home_probability: `${(record.home_win_prob * 100).toFixed(2)}%`,
     home_edge: record.home_ev.toString(),
-    away_moneyline: record.away_odds.toString(),
+    away_moneyline: formatMoneyline(record.away_odds),
     away_probability: `${(record.away_win_prob * 100).toFixed(2)}%`,
     away_edge: record.away_ev.toString(),
   }));

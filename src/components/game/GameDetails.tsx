@@ -366,25 +366,71 @@ function GameDetails({
                   </div>
 
                   <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden relative shadow-inner">
-                    {teamNames.map(team => {
-                      const probability = parseFloat(oddsData[team][0]?.probability?.replace("%", "") || "0");
-                      const isWinner = team === bestTeam;
-                      
-                      return isWinner ? (
-                        <div 
-                          key={team}
-                          className="absolute inset-y-0 left-0 bg-gradient-to-r from-green-400 to-green-500 dark:from-green-500 dark:to-green-400 rounded-l-full"
-                          style={{ width: `${probability}%` }}
-                        />
-                      ) : (
-                        <div 
-                          key={team}
-                          className="absolute inset-y-0 right-0 bg-gradient-to-l from-red-400 to-red-500 dark:from-red-500 dark:to-red-400 rounded-r-full"
-                          style={{ width: `${probability}%` }}
-                        />
+                    {(() => {
+                      // Get probabilities for both teams based on their position
+                      const team1 = teamNames[0]; 
+                      const team2 = teamNames[1];                  
+                      let prob1 = parseFloat(oddsData[team1][0]?.probability?.replace("%", "") || "0");
+                      let prob2 = parseFloat(oddsData[team2][0]?.probability?.replace("%", "") || "0");                  
+                      // Handle invalid values
+                      if (isNaN(prob1)) prob1 = 0;
+                      if (isNaN(prob2)) prob2 = 0;                    
+                      if (prob1 === 0 && prob2 === 0) {
+                        prob1 = 50;
+                        prob2 = 50;
+                      }
+                      const totalProb = prob1 + prob2;
+                      if (totalProb > 0 && totalProb !== 100) {
+                        const factor = 100 / totalProb;
+                        prob1 = Math.round(prob1 * factor);
+                        prob2 = 100 - prob1; 
+                      }                   
+                      const isTeam1Winner = team1 === bestTeam;
+                      const isTeam2Winner = team2 === bestTeam;       
+                      return (
+                        <>
+                          {/* Left team (always team1) */}
+                          <div 
+                            key={team1}
+                            className={`absolute inset-y-0 left-0 rounded-l-full ${
+                              isTeam1Winner 
+                                ? "bg-gradient-to-r from-green-400 to-green-500 dark:from-green-500 dark:to-green-400" 
+                                : "bg-gradient-to-r from-red-400 to-red-500 dark:from-red-500 dark:to-red-400"
+                            }`}
+                            style={{ width: `${prob1}%` }}
+                          >
+                            {prob1 > 15 && (
+                              <div className="absolute inset-0 flex items-center justify-start pl-2">
+                                <span className="text-[10px] sm:text-xs text-white font-semibold drop-shadow-md">
+                                  {prob1}%
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Right team (always team2) */}
+                          <div 
+                            key={team2}
+                            className={`absolute inset-y-0 right-0 rounded-r-full ${
+                              isTeam2Winner 
+                                ? "bg-gradient-to-l from-green-400 to-green-500 dark:from-green-500 dark:to-green-400" 
+                                : "bg-gradient-to-l from-red-400 to-red-500 dark:from-red-500 dark:to-red-400"
+                            }`}
+                            style={{ width: `${prob2}%` }}
+                          >
+                            {prob2 > 15 && (
+                              <div className="absolute inset-0 flex items-center justify-end pr-2">
+                                <span className="text-[10px] sm:text-xs text-white font-semibold drop-shadow-md">
+                                  {prob2}%
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </>
                       );
-                    })}
+                    })()}
                   </div>
+                 
 
                   {/* Status labels positioned at far ends under the progress bar */}
                   <div className="flex justify-between mt-2">
@@ -601,41 +647,71 @@ function GameDetails({
                   </div>
                   
                   <div className="h-3 sm:h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden relative shadow-inner">
-                    {teamNames.map(team => {
-                      const probability = parseFloat(oddsData[team][0]?.probability?.replace("%", "") || "0");
-                      const isWinner = team === bestTeam;
-                      
-                      return isWinner ? (
-                        <div 
-                          key={team}
-                          className="absolute inset-y-0 left-0 bg-gradient-to-r from-green-400 to-green-500 dark:from-green-500 dark:to-green-400 rounded-l-full"
-                          style={{ width: `${probability}%` }}
-                        >
-                          {probability > 40 && (
-                            <div className="absolute inset-0 flex items-center justify-start pl-2">
-                              <span className="text-[10px] sm:text-xs text-white font-semibold drop-shadow-md">
-                                {probability}%
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div 
-                          key={team}
-                          className="absolute inset-y-0 right-0 bg-gradient-to-l from-red-400 to-red-500 dark:from-red-500 dark:to-red-400 rounded-r-full"
-                          style={{ width: `${probability}%` }}
-                        >
-                          {probability > 30 && (
-                            <div className="absolute inset-0 flex items-center justify-end pr-2">
-                              <span className="text-[10px] sm:text-xs text-white font-semibold drop-shadow-md">
-                                {probability}%
-                              </span>
-                            </div>
-                          )}
-                        </div>
+                    {(() => {
+                      // Get probabilities for both teams
+                      const team1 = teamNames[0]; 
+                      const team2 = teamNames[1]; 
+                      let prob1 = parseFloat(oddsData[team1][0]?.probability?.replace("%", "") || "0");
+                      let prob2 = parseFloat(oddsData[team2][0]?.probability?.replace("%", "") || "0");           
+                      // Handle invalid values
+                      if (isNaN(prob1)) prob1 = 0;
+                      if (isNaN(prob2)) prob2 = 0;                   
+                      // If both are 0, set to 50-50
+                      if (prob1 === 0 && prob2 === 0) {
+                        prob1 = 50;
+                        prob2 = 50;
+                      }                     
+                      // Normalize to ensure they add up to 100%
+                      const totalProb = prob1 + prob2;
+                      if (totalProb > 0 && totalProb !== 100) {
+                        const factor = 100 / totalProb;
+                        prob1 = Math.round(prob1 * factor);
+                        prob2 = 100 - prob1; // Ensure they add up to exactly 100%
+                      }                     
+                      const isTeam1Winner = team1 === bestTeam;
+                      const isTeam2Winner = team2 === bestTeam;                      
+                      return (
+                        <>
+                          {/* Left team (always starts from left) */}
+                          <div 
+                            key={team1}
+                            className={`absolute inset-y-0 left-0 rounded-l-full ${
+                              isTeam1Winner 
+                                ? "bg-gradient-to-r from-green-400 to-green-500 dark:from-green-500 dark:to-green-400" 
+                                : "bg-gradient-to-r from-red-400 to-red-500 dark:from-red-500 dark:to-red-400"
+                            }`}
+                            style={{ width: `${prob1}%` }}
+                          >
+                            {prob1 > 15 && (
+                              <div className="absolute inset-0 flex items-center justify-start pl-2">
+                                <span className="text-[10px] sm:text-xs text-white font-semibold drop-shadow-md">
+                                  {prob1}%
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Right team (always starts from right) */}
+                          <div 
+                            key={team2}
+                            className={`absolute inset-y-0 right-0 rounded-r-full ${
+                              isTeam2Winner 
+                                ? "bg-gradient-to-l from-green-400 to-green-500 dark:from-green-500 dark:to-green-400" 
+                                : "bg-gradient-to-l from-red-400 to-red-500 dark:from-red-500 dark:to-red-400"
+                            }`}
+                            style={{ width: `${prob2}%` }}
+                          >
+                            {prob2 > 15 && (
+                              <div className="absolute inset-0 flex items-center justify-end pr-2">
+                                <span className="text-[10px] sm:text-xs text-white font-semibold drop-shadow-md">
+                                  {prob2}%
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </>
                       );
-                    })}
-                    
+                    })()}
                   </div>
                   
                   {/* Status labels positioned at far ends under the progress bar */}

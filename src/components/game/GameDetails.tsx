@@ -66,25 +66,26 @@ function GameDetails({
   const { getAdjacentGameId } = useAdjacentGameNavigation(gameIds, currentGameId);
   const prevId = getAdjacentGameId("prev");
   const nextId = getAdjacentGameId("next");
-
-  const currentIndex: number =
-    gameIds && currentGameId ? gameIds.indexOf(currentGameId) : -1;
-
-  const prevPreviews =
-    gameIds && currentIndex > 0
+  const todayPreviews =
+    gameIds && gamePreviews
       ? gameIds
-          .slice(Math.max(0, currentIndex - 7), currentIndex)
-          .map((id) => (gamePreviews ? gamePreviews[id] : undefined))
-          .filter((preview): preview is any => Boolean(preview))
+          .map((id) => gamePreviews[id])
+          .filter((game) => {
+            const gameTime = new Date(game.commence_time);
+            return gameTime.toDateString() === new Date().toDateString();
+          })
       : [];
-  const nextPreviews =
-    gameIds && currentIndex !== -1 && currentIndex < gameIds.length - 1
+  const endOfToday = new Date();
+  endOfToday.setHours(23, 59, 59, 999);
+  const upcomingPreviews =
+    gameIds && gamePreviews
       ? gameIds
-          .slice(currentIndex + 1, currentIndex + 8)
-          .map((id) => (gamePreviews ? gamePreviews[id] : undefined))
-          .filter((preview): preview is any => Boolean(preview))
+          .map((id) => gamePreviews[id])
+          .filter((game) => {
+            const gameTime = new Date(game.commence_time);
+            return gameTime > endOfToday;  // only games after today
+          })
       : [];
-
   const [headerHeight, setHeaderHeight] = useState(80);
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -815,16 +816,12 @@ function GameDetails({
         {/* Only render preview banners on non-mobile */}
         {!isMobile && (
           <>
+            {/* Left banner, can change if necessary! */}
             <PreviewBanner
               direction="left"
-              previews={prevPreviews}
+              todayPreviews={todayPreviews}
+              upcomingPreviews={upcomingPreviews}
               mode={isLargeScreen ? "open" : leftBannerMode}
-              headerHeight={headerHeight}
-            />
-            <PreviewBanner
-              direction="right"
-              previews={nextPreviews}
-              mode={isLargeScreen ? "open" : rightBannerMode}
               headerHeight={headerHeight}
             />
           </>

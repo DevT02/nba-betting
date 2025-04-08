@@ -10,6 +10,7 @@ export interface OddsRow {
   moneyline: string;
   probability: string;
   edge: string;
+  kelly: string;
 }
 
 export interface GameDetailsProps {

@@ -44,9 +44,11 @@ export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
     home_moneyline: formatMoneyline(record.home_odds),
     home_probability: `${(record.home_win_prob * 100).toFixed(2)}%`,
     home_edge: record.home_ev.toString(),
+    home_kelly: record.home_kelly !== undefined ? record.home_kelly.toString() : undefined,
     away_moneyline: formatMoneyline(record.away_odds),
     away_probability: `${(record.away_win_prob * 100).toFixed(2)}%`,
     away_edge: record.away_ev.toString(),
+    away_kelly: record.away_kelly !== undefined ? record.away_kelly.toString() : undefined,
   }));
 
   const oddsData = {
@@ -55,12 +57,14 @@ export default async function GameDetailsPage({ id }: GameDetailsPageProps) {
       moneyline: b.home_moneyline,
       probability: b.home_probability,
       edge: b.home_edge,
+      kelly: b.home_kelly,
     })),
     [away_team]: bookmakers.map((b) => ({
       book: b.book,
       moneyline: b.away_moneyline,
       probability: b.away_probability,
       edge: b.away_edge,
+      kelly: b.away_kelly,
     })),
   };
 

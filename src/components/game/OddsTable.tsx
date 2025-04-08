@@ -18,23 +18,28 @@ type OddsTableProps = {
   isMobileView?: boolean;
 };
 
-type SortColumn = "book" | "moneyline" | "probability" | "edge";
-type SortDirection = "asc" | "desc";
+export type SortColumn = "book" | "moneyline" | "edge" | "kelly";
+export type SortDirection = "asc" | "desc";
 
 const OddsTable = ({ oddsData, isMobileView = false }: OddsTableProps) => {
   const [sortColumn, setSortColumn] = useState<SortColumn>("edge");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [sortedData, setSortedData] = useState<OddsRow[]>([]);
 
-  const bestEdgeRow = React.useMemo(() => {
+  // Compute best row based on edge value (this determines which row gets the "Best" badge). I think 
+  // im probably going to want to change this..
+  const bestRow = React.useMemo(() => {
     if (!sortedData?.length) return null;
     return [...sortedData].sort((a, b) => parseFloat(b.edge) - parseFloat(a.edge))[0];
   }, [sortedData]);
 
-  const compareValues = (a: OddsRow, b: OddsRow, column: SortColumn, direction: SortDirection): number => {
-    let valueA, valueB;
-    let comparison = 0;
-
+  const compareValues = (
+    a: OddsRow,
+    b: OddsRow,
+    column: SortColumn,
+    direction: SortDirection
+  ): number => {
+    let valueA, valueB, comparison = 0;
     switch (column) {
       case "book":
         valueA = a.book.toLowerCase();
@@ -46,14 +51,14 @@ const OddsTable = ({ oddsData, isMobileView = false }: OddsTableProps) => {
         valueB = parseInt(b.moneyline, 10);
         comparison = valueA - valueB;
         break;
-      case "probability":
-        valueA = parseFloat(a.probability.replace("%", ""));
-        valueB = parseFloat(b.probability.replace("%", ""));
-        comparison = valueA - valueB;
-        break;
       case "edge":
         valueA = parseFloat(a.edge);
         valueB = parseFloat(b.edge);
+        comparison = valueA - valueB;
+        break;
+      case "kelly":
+        valueA = parseFloat(a.kelly);
+        valueB = parseFloat(b.kelly);
         comparison = valueA - valueB;
         break;
     }
@@ -65,20 +70,16 @@ const OddsTable = ({ oddsData, isMobileView = false }: OddsTableProps) => {
       setSortedData([]);
       return;
     }
-
     const dataToSort = [...oddsData];
-    const sorted = dataToSort.sort((a, b) => {
+    dataToSort.sort((a, b) => {
       const primaryComparison = compareValues(a, b, sortColumn, sortDirection);
       if (primaryComparison === 0) {
-        if (sortColumn !== "edge") {
-          return compareValues(a, b, "edge", "desc");
-        }
-        return compareValues(a, b, "probability", "desc");
+        // If primary columns tie, fallback to edge descending.
+        return compareValues(a, b, "edge", "desc");
       }
       return primaryComparison;
     });
-
-    setSortedData(sorted);
+    setSortedData(dataToSort);
   }, [oddsData, sortColumn, sortDirection]);
 
   const handleSort = (column: SortColumn) => {
@@ -86,19 +87,34 @@ const OddsTable = ({ oddsData, isMobileView = false }: OddsTableProps) => {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
       setSortColumn(column);
-      setSortDirection(column === "edge" || column === "probability" ? "desc" : "asc");
+      // For numerical fields default to descending, otherwise ascending.
+      setSortDirection(column === "edge" || column === "kelly" ? "desc" : "asc");
     }
   };
 
   const renderSortIcon = (column: SortColumn) => {
     if (sortColumn !== column) return null;
-
     return sortDirection === "asc" ? (
       <ChevronUp className="inline h-4 w-4 ml-1" />
     ) : (
       <ChevronDown className="inline h-4 w-4 ml-1" />
     );
   };
+
+  // For coloring numeric values (Edge and Kelly)
+  const edgeColorClass = (value: number) =>
+    value > 0
+      ? "text-emerald-600 dark:text-emerald-400"
+      : value < 0
+      ? "text-rose-600 dark:text-rose-400"
+      : "text-muted-foreground";
+
+  const kellyColorClass = (value: number) =>
+    value > 0
+      ? "text-emerald-600 dark:text-emerald-400"
+      : value < 0
+      ? "text-rose-600 dark:text-rose-400"
+      : "text-muted-foreground";
 
   return (
     <div className="mt-6 overflow-hidden border border-border/30 rounded-lg bg-card/80 shadow-sm">
@@ -107,40 +123,41 @@ const OddsTable = ({ oddsData, isMobileView = false }: OddsTableProps) => {
         <Table className="w-full text-sm max-[419px]:text-xs">
           <TableHeader className="sticky top-0 z-10 bg-gradient-to-r from-background to-primary/5">
             <TableRow className="border-b border-border bg-card hover:bg-card">
+              {/* Casino column with Best badge */}
               <TableHead
                 className="min-w-[70px] max-[419px]:min-w-[60px] sm:w-1/4 font-medium text-foreground cursor-pointer relative group transition-colors max-[419px]:py-2 max-[419px]:px-2"
                 onClick={() => handleSort("book")}
               >
-                <span className={`${sortColumn === "book" ? "text-primary" : ""}`}>
+                <span className={sortColumn === "book" ? "text-primary" : ""}>
                   <span className="sm:inline">Casino</span> {renderSortIcon("book")}
                 </span>
               </TableHead>
+              {/* Money column */}
               <TableHead
                 className="min-w-[60px] max-[419px]:min-w-[50px] sm:w-1/4 font-medium text-foreground cursor-pointer relative group transition-colors max-[419px]:py-2 max-[419px]:px-2"
                 onClick={() => handleSort("moneyline")}
               >
-                <span className={`${sortColumn === "moneyline" ? "text-primary" : ""}`}>
+                <span className={sortColumn === "moneyline" ? "text-primary" : ""}>
                   <span className="hidden sm:inline">Money</span>
-                  <span className="sm:hidden">ML</span>
-                  {renderSortIcon("moneyline")}
+                  <span className="sm:hidden">ML</span> {renderSortIcon("moneyline")}
                 </span>
               </TableHead>
-              <TableHead
-                className="min-w-[60px] max-[419px]:min-w-[50px] sm:w-1/4 font-medium text-foreground cursor-pointer relative group transition-colors max-[419px]:py-2 max-[419px]:px-2"
-                onClick={() => handleSort("probability")}
-              >
-                <span className={`${sortColumn === "probability" ? "text-primary" : ""}`}>
-                  <span className="hidden sm:inline">Win Probability</span>
-                  <span className="sm:hidden">Win %</span>
-                  {renderSortIcon("probability")}
-                </span>
-              </TableHead>
+              {/* Edge column (now second-to-last) */}
               <TableHead
                 className="min-w-[60px] max-[419px]:min-w-[50px] sm:w-1/4 font-medium text-foreground cursor-pointer relative group transition-colors max-[419px]:py-2 max-[419px]:px-2"
                 onClick={() => handleSort("edge")}
               >
-                <span className={`${sortColumn === "edge" ? "text-primary" : ""}`}>
+                <span className={sortColumn === "edge" ? "text-primary" : ""}>
                   Edge {renderSortIcon("edge")}
+                </span>
+              </TableHead>
+              {/* Kelly column (now last) */}
+              <TableHead
+                className="min-w-[60px] max-[419px]:min-w-[50px] sm:w-1/4 font-medium text-foreground cursor-pointer relative group transition-colors max-[419px]:py-2 max-[419px]:px-2"
+                onClick={() => handleSort("kelly")}
+              >
+                <span className={sortColumn === "kelly" ? "text-primary" : ""}>
+                  Kelly {renderSortIcon("kelly")}
                 </span>
               </TableHead>
             </TableRow>
@@ -148,20 +165,15 @@ const OddsTable = ({ oddsData, isMobileView = false }: OddsTableProps) => {
           <TableBody>
             {sortedData && sortedData.length > 0 ? (
               sortedData.map((row, idx) => {
-                const edgeValue = parseFloat(row.edge);
-                const edgeColorClass =
-                  edgeValue > 0
-                    ? "text-emerald-600 dark:text-emerald-400"
-                    : edgeValue < 0
-                    ? "text-rose-600 dark:text-rose-400"
-                    : "text-muted-foreground";
-                const isBest = bestEdgeRow && row.book === bestEdgeRow.book;
+                const edgeVal = parseFloat(row.edge);
+                const kellyVal = parseFloat(row.kelly);
+                const isBest = bestRow && row.book === bestRow.book;
                 
                 return (
                   <TableRow
                     key={idx}
                     className={`border-b border-border last:border-0 hover:bg-muted/30 transition-all duration-200 ${
-                      edgeValue > 3 ? "bg-emerald-50/30 dark:bg-emerald-950/10" : ""
+                      edgeVal > 3 ? "bg-emerald-50/30 dark:bg-emerald-950/10" : ""
                     } ${isBest ? "bg-amber-50/20 dark:bg-amber-950/10" : ""}`}
                     style={{
                       animationDelay: `${idx * 50}ms`,
@@ -172,6 +184,7 @@ const OddsTable = ({ oddsData, isMobileView = false }: OddsTableProps) => {
                       transform: "translateY(0)",
                     }}
                   >
+                    {/* Casino cell with Best badge */}
                     <TableCell className="py-3 max-[419px]:py-2 max-[419px]:px-2 font-medium">
                       <div className="flex items-center gap-1 sm:gap-3">
                         <div className="hidden sm:flex relative w-8 h-8 items-center justify-center bg-card border border-border/50 rounded-md overflow-hidden shadow-sm flex-shrink-0">
@@ -186,30 +199,25 @@ const OddsTable = ({ oddsData, isMobileView = false }: OddsTableProps) => {
                         </div>
                         <span className="text-sm max-[419px]:text-xs font-medium truncate max-w-[60px] md:max-w-none">
                           {row.book}
-                          {isBest && <span className="max-[419px]:inline sm:hidden text-amber-500 ml-1">★</span>}
                         </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-3 max-[419px]:py-2 max-[419px]:px-2 font-medium">{row.moneyline}</TableCell>
-                    <TableCell className="py-3 max-[419px]:py-2 max-[419px]:px-2 font-medium">{row.probability}</TableCell>
-                    <TableCell className={`py-3 max-[419px]:py-2 max-[419px]:px-2 font-medium ${edgeColorClass}`}>
-                      <div className="flex items-center">
-                        <div className="flex items-center justify-center w-5 h-5 max-[419px]:w-4 max-[419px]:h-4 rounded-full bg-emerald-100 dark:bg-emerald-950/30 mr-2 max-[419px]:mr-1">
-                          {edgeValue > 0 ? (
-                            <span className="text-emerald-500 dark:text-emerald-400 text-xs">↑</span>
-                          ) : edgeValue < 0 ? (
-                            <span className="text-rose-500 dark:text-rose-400 text-xs">↓</span>
-                          ) : (
-                            <span className="text-muted-foreground text-xs">–</span>
-                          )}
-                        </div>
-                        <span>{row.edge}</span>
                         {isBest && (
-                          <span className="ml-2 hidden sm:inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 text-xs font-medium text-amber-800 dark:text-amber-300">
+                          <span className="ml-1 inline-flex items-center px-1 py-0.5 rounded bg-amber-100 text-amber-800 text-xs">
                             Best
                           </span>
                         )}
                       </div>
+                    </TableCell>
+                    {/* Money cell */}
+                    <TableCell className="py-3 max-[419px]:py-2 max-[419px]:px-2 font-medium">
+                      {row.moneyline}
+                    </TableCell>
+                    {/* Edge cell with green/red styling */}
+                    <TableCell className={`py-3 max-[419px]:py-2 max-[419px]:px-2 font-medium ${edgeColorClass(edgeVal)}`}>
+                      {row.edge}
+                    </TableCell>
+                    {/* Kelly cell with green/red styling */}
+                    <TableCell className={`py-3 max-[419px]:py-2 max-[419px]:px-2 font-medium ${kellyColorClass(kellyVal)}`}>
+                      {row.kelly || "N/A"}
                     </TableCell>
                   </TableRow>
                 );
@@ -226,7 +234,6 @@ const OddsTable = ({ oddsData, isMobileView = false }: OddsTableProps) => {
       </div>
     </div>
   );
-
 };
 
 export default OddsTable;

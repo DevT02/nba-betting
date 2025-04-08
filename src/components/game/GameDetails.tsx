@@ -265,13 +265,15 @@ function GameDetails({
                   )}
                   <div
                     ref={scrollContainerRef}
+                    style={{
+                      touchAction: 'pan-y'  // Allow vertical scrolling; prevent horizontal drag conflicts.
+                    }}
+                    onPointerDown={(e) => e.stopPropagation()} // Prevent pointer events from bubbling up.
                     className="py-3 flex items-center justify-start sm:justify-center gap-x-4 overflow-x-auto whitespace-nowrap px-4 text-xs scroll-pl-0 sm:scroll-pl-4"
                     onScroll={handleScroll}
                   >
                     <div className="flex items-center gap-1">
-                      <span className="font-medium text-purple-500 dark:text-purple-400">
-                        H2H:
-                      </span>
+                      <span className="font-medium text-purple-500 dark:text-purple-400">H2H:</span>
                       <span className="text-xs">{gameDetails.h2h_record}</span>
                     </div>
                     <div className="flex items-center gap-1">

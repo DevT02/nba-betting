@@ -206,6 +206,9 @@ function GameDetails({
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             onDragEnd={handleDragEnd}
+            dragElastic={0.1}
+            dragMomentum={true}
+            dragTransition={{ bounceStiffness: 300, bounceDamping: 30 }}
             variants={cardVariants}
             initial="initial"
             animate={swipeDirection ? swipeDirection : "initial"}
@@ -215,6 +218,7 @@ function GameDetails({
               backgroundColor: "hsl(var(--card))",
               color: "hsl(var(--card-foreground))",
             }}
+            whileTap={{ cursor: "grabbing" }}
           >
             <div className="flex flex-col items-center gap-4 mb-4">
               <h1 className="font-bold text-center">
@@ -265,15 +269,18 @@ function GameDetails({
                   )}
                   <div
                     ref={scrollContainerRef}
-                    style={{
-                      touchAction: 'pan-y'  // Allow vertical scrolling; prevent horizontal drag conflicts.
-                    }}
-                    onPointerDown={(e) => e.stopPropagation()} // Prevent pointer events from bubbling up.
                     className="py-3 flex items-center justify-start sm:justify-center gap-x-4 overflow-x-auto whitespace-nowrap px-4 text-xs scroll-pl-0 sm:scroll-pl-4"
                     onScroll={handleScroll}
+                    onPointerDown={(e) => {
+                      // Stop propagation to prevent the parent motion.div from capturing this event
+                      e.stopPropagation();
+                    }}
+                    style={{ touchAction: "pan-x" }} // Explicitly allow horizontal pan                  
                   >
                     <div className="flex items-center gap-1">
-                      <span className="font-medium text-purple-500 dark:text-purple-400">H2H:</span>
+                      <span className="font-medium text-purple-500 dark:text-purple-400">
+                        H2H:
+                      </span>
                       <span className="text-xs">{gameDetails.h2h_record}</span>
                     </div>
                     <div className="flex items-center gap-1">

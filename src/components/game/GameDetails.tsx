@@ -272,10 +272,19 @@ function GameDetails({
                     className="py-3 flex items-center justify-start sm:justify-center gap-x-4 overflow-x-auto whitespace-nowrap px-4 text-xs scroll-pl-0 sm:scroll-pl-4"
                     onScroll={handleScroll}
                     onPointerDown={(e) => {
-                      // Stop propagation to prevent the parent motion.div from capturing this event
                       e.stopPropagation();
                     }}
-                    style={{ touchAction: "pan-x" }} // Explicitly allow horizontal pan                  
+                    onTouchStart={(e) => {
+                      e.stopPropagation();
+                    }}
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                    }}
+                    style={{ 
+                      touchAction: "pan-x", 
+                      WebkitOverflowScrolling: "touch", 
+                      overscrollBehaviorX: "contain" 
+                    }}
                   >
                     <div className="flex items-center gap-1">
                       <span className="font-medium text-purple-500 dark:text-purple-400">

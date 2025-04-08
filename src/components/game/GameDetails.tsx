@@ -50,7 +50,14 @@ function GameDetails({
     timeZone: userTimeZone,
   }).format(eventTime);
 
+  // Assume teamNames is provided as [homeTeam, awayTeam].
+  // We want to display "away vs. home" so we swap the order.
+  const homeTeam = teamNames[0];
+  const awayTeam = teamNames[1];
+  const orderedTeamNames = [awayTeam, homeTeam];
+
   const bestTeam = React.useMemo(() => {
+    // Best team is calculated from the original data order (order doesn't affect calculation)
     return teamNames.reduce((prev, curr) => {
       const currProb =
         parseFloat(oddsData[curr][0]?.probability.replace("%", "")) || 0;
@@ -60,8 +67,9 @@ function GameDetails({
     }, teamNames[0]);
   }, [teamNames, oddsData]);
 
-  const logoLeft = logos?.[teamNames[0]] ?? getTeamLogo(teamNames[0]);
-  const logoRight = logos?.[teamNames[1]] ?? getTeamLogo(teamNames[1]);
+  // Update logos: left logo is for away team, right logo is for home team.
+  const logoLeft = logos?.[awayTeam] ?? getTeamLogo(awayTeam);
+  const logoRight = logos?.[homeTeam] ?? getTeamLogo(homeTeam);
 
   const { getAdjacentGameId } = useAdjacentGameNavigation(gameIds, currentGameId);
   const prevId = getAdjacentGameId("prev");
@@ -215,18 +223,18 @@ function GameDetails({
                     <div className="flex items-center justify-center gap-2 sm:gap-4 flex-nowrap">
                       <img
                         src={logoLeft}
-                        alt={`${teamNames[0]} logo`}
+                        alt={`${awayTeam} logo`}
                         className="w-8 h-8 max-[319px]:w-6 max-[319px]:h-6 sm:w-10 sm:h-10 md:w-12 md:h-12"
                       />
                       <span className="hidden max-[449px]:block whitespace-normal max-[319px]:max-w-[120px] max-[319px]:text-[0.65rem] overflow-hidden truncate">
-                        {getShortTeamName(teamNames[0])} vs. {getShortTeamName(teamNames[1])}
+                        {getShortTeamName(awayTeam)} vs. {getShortTeamName(homeTeam)}
                       </span>
                       <span className="block max-[450px]:hidden whitespace-nowrap text-[0.75rem] text-xl sm:text-2xl md:text-3xl lg:text-4xl overflow-hidden truncate">
-                        {teamNames[0]} vs. {teamNames[1]}
+                        {awayTeam} vs. {homeTeam}
                       </span>
                       <img
                         src={logoRight}
-                        alt={`${teamNames[1]} logo`}
+                        alt={`${homeTeam} logo`}
                         className="w-8 h-8 max-[319px]:w-6 max-[319px]:h-6 sm:w-10 sm:h-10 md:w-12 md:h-12"
                       />
                     </div>
@@ -280,7 +288,7 @@ function GameDetails({
                 </div>
               </div>
 
-              {/* Mobile prediction component with improvements */}
+              {/* Mobile prediction component */}
               <div className="flex flex-col items-center gap-2.5 border border-yellow-200 dark:border-yellow-900/50 p-3 rounded-xl w-full bg-gradient-to-b from-yellow-50/40 to-transparent dark:from-yellow-900/20 shadow-sm mb-4">
                 {/* Header */}
                 <div className="flex items-center justify-center gap-1.5 w-full">
@@ -297,34 +305,41 @@ function GameDetails({
                 <div className="w-full bg-white/50 dark:bg-black/10 rounded-lg p-2.5 relative">
                   {/* Teams and logos row */}
                   <div className="flex justify-between items-center mb-3 relative">
-                    {/* Left team */}
-                    <div className="flex items-center gap-2">
-                      <div className={`w-7 h-7 rounded-full p-1 flex items-center justify-center shadow-sm ${
-                        teamNames[0] === bestTeam
-                          ? "bg-green-100 dark:bg-green-900/30 ring-1 ring-green-200 dark:ring-green-900/50" 
-                          : "bg-red-100 dark:bg-red-900/30 ring-1 ring-red-200 dark:ring-red-900/50"
-                      }`}>
-                        <img 
-                          src={logos?.[teamNames[0]] ?? getTeamLogo(teamNames[0])}
-                          alt={`${teamNames[0]} logo`}
-                          className="w-full h-full object-contain"
-                        />
-                      </div>
-                      <div>
-                        <div className="font-medium text-xs">
-                          {getShortTeamName(teamNames[0])}
+                    {orderedTeamNames.map((team, index) => {
+                      const probability = parseFloat(oddsData[team][0]?.probability?.replace("%", "") || "0");
+                      const isWinner = team === bestTeam;
+                      const isRightTeam = index === 1;
+                      return (
+                        <div key={team} className={`flex items-center gap-2 ${isRightTeam ? 'flex-row-reverse' : ''}`}>
+                          <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full p-1 flex items-center justify-center shadow-sm ${
+                            isWinner 
+                              ? "bg-green-100 dark:bg-green-900/30 ring-1 ring-green-200 dark:ring-green-900/50" 
+                              : "bg-red-100 dark:bg-red-900/30 ring-1 ring-red-200 dark:ring-red-900/50"
+                          }`}>
+                            <img 
+                              src={logos?.[team] ?? getTeamLogo(team)}
+                              alt={`${team} logo`}
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                          <div>
+                            <div className="font-medium text-xs sm:text-sm">
+                              <span className="hidden sm:inline">{team}</span>
+                              <span className="inline sm:hidden">{getShortTeamName(team)}</span>
+                            </div>
+                            <div className={`text-xs sm:text-sm font-semibold ${isRightTeam ? 'text-right' : 'text-left'} ${
+                              isWinner 
+                                ? "text-green-600 dark:text-green-400" 
+                                : "text-red-600 dark:text-red-400"
+                            }`}>
+                              {oddsData[team][0]?.probability || "N/A"}
+                            </div>
+                          </div>
                         </div>
-                        <div className={`text-xs font-semibold ${
-                          teamNames[0] === bestTeam
-                            ? "text-green-600 dark:text-green-400" 
-                            : "text-red-600 dark:text-red-400"
-                        }`}>
-                          {oddsData[teamNames[0]][0]?.probability || "N/A"}
-                        </div>
-                      </div>
-                    </div>
+                      );
+                    })}
                     
-                    {/* VS marker in the middle */}
+                    {/* VS marker */}
                     <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
                       <div className="bg-gradient-to-b from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 
                                     rounded-full h-5 w-5 flex items-center justify-center shadow-md 
@@ -336,43 +351,15 @@ function GameDetails({
                         </span>
                       </div>
                     </div>
-                    
-                    {/* Right team */}
-                    <div className="flex items-center gap-2 flex-row-reverse">
-                      <div className={`w-7 h-7 rounded-full p-1 flex items-center justify-center shadow-sm ${
-                        teamNames[1] === bestTeam
-                          ? "bg-green-100 dark:bg-green-900/30 ring-1 ring-green-200 dark:ring-green-900/50" 
-                          : "bg-red-100 dark:bg-red-900/30 ring-1 ring-red-200 dark:ring-red-900/50"
-                      }`}>
-                        <img 
-                          src={logos?.[teamNames[1]] ?? getTeamLogo(teamNames[1])}
-                          alt={`${teamNames[1]} logo`}
-                          className="w-full h-full object-contain"
-                        />
-                      </div>
-                      <div>
-                        <div className="font-medium text-xs text-right">
-                          {getShortTeamName(teamNames[1])}
-                        </div>
-                        <div className={`text-xs font-semibold text-right ${
-                          teamNames[1] === bestTeam
-                            ? "text-green-600 dark:text-green-400" 
-                            : "text-red-600 dark:text-red-400"
-                        }`}>
-                          {oddsData[teamNames[1]][0]?.probability || "N/A"}
-                        </div>
-                      </div>
-                    </div>
                   </div>
-
+                  
                   <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden relative shadow-inner">
                     {(() => {
-                      // Get probabilities for both teams based on their position
-                      const team1 = teamNames[0]; 
-                      const team2 = teamNames[1];                  
+                      // Use the ordered teams for probability calculation.
+                      const team1 = orderedTeamNames[0]; 
+                      const team2 = orderedTeamNames[1];                  
                       let prob1 = parseFloat(oddsData[team1][0]?.probability?.replace("%", "") || "0");
                       let prob2 = parseFloat(oddsData[team2][0]?.probability?.replace("%", "") || "0");                  
-                      // Handle invalid values
                       if (isNaN(prob1)) prob1 = 0;
                       if (isNaN(prob2)) prob2 = 0;                    
                       if (prob1 === 0 && prob2 === 0) {
@@ -383,13 +370,13 @@ function GameDetails({
                       if (totalProb > 0 && totalProb !== 100) {
                         const factor = 100 / totalProb;
                         prob1 = Math.round(prob1 * factor);
-                        prob2 = 100 - prob1; 
+                        prob2 = 100 - prob1;
                       }                   
                       const isTeam1Winner = team1 === bestTeam;
                       const isTeam2Winner = team2 === bestTeam;       
                       return (
                         <>
-                          {/* Left team (always team1) */}
+                          {/* Left team */}
                           <div 
                             key={team1}
                             className={`absolute inset-y-0 left-0 rounded-l-full ${
@@ -408,7 +395,7 @@ function GameDetails({
                             )}
                           </div>
                           
-                          {/* Right team (always team2) */}
+                          {/* Right team */}
                           <div 
                             key={team2}
                             className={`absolute inset-y-0 right-0 rounded-r-full ${
@@ -430,16 +417,14 @@ function GameDetails({
                       );
                     })()}
                   </div>
-                 
-
-                  {/* Status labels positioned at far ends under the progress bar */}
+                  
+                  {/* Status labels */}
                   <div className="flex justify-between mt-2">
-                    {teamNames.map(team => {
+                    {orderedTeamNames.map(team => {
                       const isWinner = team === bestTeam;
-                      
                       return (
                         <div key={`status-${team}`} className={`w-auto`}>
-                          <span className={`px-1.5 py-0.5 rounded-sm text-[9px] font-medium ${
+                          <span className={`px-1.5 py-0.5 rounded-sm text-[9px] sm:text-xs font-medium ${
                             isWinner 
                               ? "bg-green-100/80 text-green-700 dark:bg-green-900/40 dark:text-green-300" 
                               : "bg-red-100/80 text-red-700 dark:bg-red-900/40 dark:text-red-300"
@@ -453,7 +438,7 @@ function GameDetails({
                 </div>
               </div>
 
-              <Tabs defaultValue={teamNames[0]}>
+              <Tabs defaultValue={orderedTeamNames[0]}>
                 <TabsList
                   className="mx-auto mb-3 bg-card/80 border border-border/30 shadow-sm rounded-lg
                   w-fit
@@ -461,12 +446,11 @@ function GameDetails({
                   gap-1
                 "
                 >
-                  {teamNames.map((team) => (
+                  {orderedTeamNames.map((team) => (
                     <TabsTrigger
                       key={team}
                       value={team}
-                      className="relative px-3 py-1.5 text-sm font-medium transition-all duration-200
-                                min-w-[100px] max-[419px]:min-w-[70px]
+                      className="relative min-w-[100px] px-3 py-1.5 text-sm font-medium transition-all duration-200
                                 data-[state=active]:bg-transparent 
                                 data-[state=active]:text-foreground
                                 data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground/80"
@@ -490,7 +474,7 @@ function GameDetails({
                     </TabsTrigger>
                   ))}
                 </TabsList>
-                {teamNames.map((team) => (
+                {orderedTeamNames.map((team) => (
                   <TabsContent
                     key={team}
                     value={team}
@@ -520,18 +504,18 @@ function GameDetails({
                     <div className="flex items-center justify-center gap-2 sm:gap-4 flex-nowrap">
                       <img
                         src={logoLeft}
-                        alt={`${teamNames[0]} logo`}
+                        alt={`${awayTeam} logo`}
                         className="w-8 h-8 max-[319px]:w-6 max-[319px]:h-6 sm:w-10 sm:h-10 md:w-12 md:h-12"
                       />
                       <span className="block max-[319px]:block hidden max-[319px]:whitespace-normal max-[319px]:max-w-[120px] max-[319px]:text-[0.65rem] overflow-hidden truncate">
-                        {getShortTeamName(teamNames[0])} vs. {getShortTeamName(teamNames[1])}
+                        {getShortTeamName(awayTeam)} vs. {getShortTeamName(homeTeam)}
                       </span>
                       <span className="whitespace-nowrap text-[0.75rem] max-[319px]:hidden text-xl sm:text-2xl md:text-3xl lg:text-4xl overflow-hidden truncate">
-                        {teamNames[0]} vs. {teamNames[1]}
+                        {awayTeam} vs. {homeTeam}
                       </span>
                       <img
                         src={logoRight}
-                        alt={`${teamNames[1]} logo`}
+                        alt={`${homeTeam} logo`}
                         className="w-8 h-8 max-[319px]:w-6 max-[319px]:h-6 sm:w-10 sm:h-10 md:w-12 md:h-12"
                       />
                     </div>
@@ -597,11 +581,10 @@ function GameDetails({
                 <div className="w-full bg-white/50 dark:bg-black/10 rounded-lg p-2.5 sm:p-3 relative">
                   {/* Teams and logos row */}
                   <div className="flex justify-between items-center mb-3 relative">
-                    {teamNames.map((team, index) => {
+                    {orderedTeamNames.map((team, index) => {
                       const probability = parseFloat(oddsData[team][0]?.probability?.replace("%", "") || "0");
                       const isWinner = team === bestTeam;
-                      const isRightTeam = index === 1; // Second team in the array
-                      
+                      const isRightTeam = index === 1;
                       return (
                         <div key={team} className={`flex items-center gap-2 ${isRightTeam ? 'flex-row-reverse' : ''}`}>
                           <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full p-1 flex items-center justify-center shadow-sm ${
@@ -620,19 +603,19 @@ function GameDetails({
                               <span className="hidden sm:inline">{team}</span>
                               <span className="inline sm:hidden">{getShortTeamName(team)}</span>
                             </div>
-                            <div className={`text-xs sm:text-sm font-semibold ${
+                            <div className={`text-xs sm:text-sm font-semibold ${isRightTeam ? 'text-right' : 'text-left'} ${
                               isWinner 
                                 ? "text-green-600 dark:text-green-400" 
                                 : "text-red-600 dark:text-red-400"
-                            } ${isRightTeam ? 'text-right' : 'text-left'}`}>
-                            {oddsData[team][0]?.probability || "N/A"}
+                            }`}>
+                              {oddsData[team][0]?.probability || "N/A"}
                             </div>
                           </div>
                         </div>
                       );
                     })}
                     
-                    {/* VS marker in the middle */}
+                    {/* VS marker */}
                     <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
                       <div className="bg-gradient-to-b from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 
                                     rounded-full h-5 w-5 sm:h-6 sm:w-6 flex items-center justify-center shadow-md 
@@ -648,37 +631,32 @@ function GameDetails({
                   
                   <div className="h-3 sm:h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden relative shadow-inner">
                     {(() => {
-                      // Get probabilities for both teams
-                      const team1 = teamNames[0]; 
-                      const team2 = teamNames[1]; 
+                      const team1 = orderedTeamNames[0]; 
+                      const team2 = orderedTeamNames[1]; 
                       let prob1 = parseFloat(oddsData[team1][0]?.probability?.replace("%", "") || "0");
                       let prob2 = parseFloat(oddsData[team2][0]?.probability?.replace("%", "") || "0");           
-                      // Handle invalid values
                       if (isNaN(prob1)) prob1 = 0;
                       if (isNaN(prob2)) prob2 = 0;                   
-                      // If both are 0, set to 50-50
                       if (prob1 === 0 && prob2 === 0) {
                         prob1 = 50;
                         prob2 = 50;
                       }                     
-                      // Normalize to ensure they add up to 100%
                       const totalProb = prob1 + prob2;
                       if (totalProb > 0 && totalProb !== 100) {
                         const factor = 100 / totalProb;
                         prob1 = Math.round(prob1 * factor);
-                        prob2 = 100 - prob1; // Ensure they add up to exactly 100%
+                        prob2 = 100 - prob1;
                       }                     
                       const isTeam1Winner = team1 === bestTeam;
                       const isTeam2Winner = team2 === bestTeam;                      
                       return (
                         <>
-                          {/* Left team (always starts from left) */}
                           <div 
                             key={team1}
                             className={`absolute inset-y-0 left-0 rounded-l-full ${
                               isTeam1Winner 
                                 ? "bg-gradient-to-r from-green-400 to-green-500 dark:from-green-500 dark:to-green-400" 
-                                : "bg-gradient-to-r from-red-400 to-red-500 dark:from-red-500 dark:to-red-400"
+                                : "bg-gradient-to-r from-red-400 to-red-500 dark:from-red-400 dark:to-red-500"
                             }`}
                             style={{ width: `${prob1}%` }}
                           >
@@ -691,13 +669,12 @@ function GameDetails({
                             )}
                           </div>
                           
-                          {/* Right team (always starts from right) */}
                           <div 
                             key={team2}
                             className={`absolute inset-y-0 right-0 rounded-r-full ${
                               isTeam2Winner 
                                 ? "bg-gradient-to-l from-green-400 to-green-500 dark:from-green-500 dark:to-green-400" 
-                                : "bg-gradient-to-l from-red-400 to-red-500 dark:from-red-500 dark:to-red-400"
+                                : "bg-gradient-to-l from-red-400 to-red-500 dark:from-red-400 dark:to-red-500"
                             }`}
                             style={{ width: `${prob2}%` }}
                           >
@@ -714,14 +691,12 @@ function GameDetails({
                     })()}
                   </div>
                   
-                  {/* Status labels positioned at far ends under the progress bar */}
                   <div className="flex justify-between mt-2">
-                    {teamNames.map(team => {
+                    {orderedTeamNames.map(team => {
                       const isWinner = team === bestTeam;
-                      
                       return (
                         <div key={`status-${team}`} className={`w-auto`}>
-                          <span className={`px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded-sm text-[9px] sm:text-xs font-medium ${
+                          <span className={`px-1.5 py-0.5 rounded-sm text-[9px] sm:text-xs font-medium ${
                             isWinner 
                               ? "bg-green-100/80 text-green-700 dark:bg-green-900/40 dark:text-green-300" 
                               : "bg-red-100/80 text-red-700 dark:bg-red-900/40 dark:text-red-300"
@@ -733,17 +708,16 @@ function GameDetails({
                     })}
                   </div>
                 </div>
-              </div>      
+              </div>
             </div>
-            <Tabs defaultValue={teamNames[0]}>
+            <Tabs defaultValue={orderedTeamNames[0]}>
               <TabsList
                 className="mx-auto mb-3 bg-card/80 border border-border/30 shadow-sm rounded-lg
                 w-fit
                 flex
-                gap-1
-              "
+                gap-1"
               >
-                {teamNames.map((team) => (
+                {orderedTeamNames.map((team) => (
                   <TabsTrigger
                     key={team}
                     value={team}
@@ -760,7 +734,10 @@ function GameDetails({
                           className="w-3.5 h-3.5 object-contain"
                         />
                       </div>
-                      <span>{team}</span>
+                      <span className="max-[419px]:hidden">{team}</span>
+                      <span className="hidden max-[419px]:block">
+                        {getShortTeamName(team)}
+                      </span>
                     </div>
                     <div className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-primary
                                     scale-x-0 transition-transform duration-200
@@ -768,7 +745,7 @@ function GameDetails({
                   </TabsTrigger>
                 ))}
               </TabsList>
-              {teamNames.map((team) => (
+              {orderedTeamNames.map((team) => (
                 <TabsContent
                   key={team}
                   value={team}

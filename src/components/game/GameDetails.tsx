@@ -230,10 +230,10 @@ function GameDetails({
                         alt={`${awayTeam} logo`}
                         className="w-8 h-8 max-[319px]:w-6 max-[319px]:h-6 sm:w-10 sm:h-10 md:w-12 md:h-12"
                       />
-                      <span className="hidden max-[449px]:block whitespace-normal max-[319px]:max-w-[120px] max-[319px]:text-[0.65rem] overflow-hidden truncate">
+                      <span className="hidden max-[500px]:block whitespace-normal max-[319px]:max-w-[120px] max-[319px]:text-[0.65rem] overflow-hidden truncate">
                         {getShortTeamName(awayTeam)} vs. {getShortTeamName(homeTeam)}
                       </span>
-                      <span className="block max-[450px]:hidden whitespace-nowrap text-[0.75rem] text-xl sm:text-2xl md:text-3xl lg:text-4xl overflow-hidden truncate">
+                      <span className="block max-[500px]:hidden whitespace-nowrap text-[0.75rem] text-xl sm:text-2xl md:text-3xl lg:text-4xl overflow-hidden truncate">
                         {awayTeam} vs. {homeTeam}
                       </span>
                       <img

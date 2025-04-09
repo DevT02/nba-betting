@@ -266,7 +266,12 @@ const OddsTable = ({ oddsData, isMobileView = false }: OddsTableProps) => {
                           {row.book}
                         </span>
                         {isBest && (
-                          <span className="ml-1 inline-flex items-center px-1 py-0.5 rounded bg-amber-100 text-amber-800 text-xs">
+                          <span
+                            className="ml-2 hidden sm:inline-flex items-center rounded-full bg-amber-200 dark:bg-amber-800/50 px-2 py-0.5 text-xs font-medium text-amber-900 dark:text-amber-300 shadow-md"
+                            style={{
+                              // boxShadow: "0 0 2px rgba(255, 193, 7, 0.8), 0 0 2px rgba(255, 193, 7, 0.6)", // Adds a glowing effect
+                            }}
+                          >
                             Best
                           </span>
                         )}

@@ -18,6 +18,7 @@ import {
   CalendarIcon,
 } from "lucide-react";
 import PreviewBanner from "./PreviewBanner";
+import InfoBanner from "./InfoBanner";
 
 import { useAdjacentGameNavigation } from "@/hooks/useAdjacentGameNavigation";
 import { usePreviewMode } from "@/hooks/usePreviewMode";
@@ -840,19 +841,25 @@ function GameDetails({
           </button>
         </div>
 
-        {/* Only render preview banners on non-mobile */}
+        {/* Only render preview banners and right sidebar on non-mobile */}
         {!isMobile && (
-          <>
-            {/* Left banner, can change if necessary! */}
-            <PreviewBanner
-              direction="left"
-              todayPreviews={todayPreviews}
-              upcomingPreviews={upcomingPreviews}
-              mode={isLargeScreen ? "open" : leftBannerMode}
-              headerHeight={headerHeight}
-            />
-          </>
+          <div className="flex flex-col lg:flex-row gap-8">
+            <div className="flex-1">
+              <PreviewBanner
+                direction="left"
+                todayPreviews={todayPreviews}
+                upcomingPreviews={upcomingPreviews}
+                mode={isLargeScreen ? "open" : leftBannerMode}
+                headerHeight={headerHeight}
+              />
+            </div>
+            <div className="hidden lg:block">
+              <InfoBanner headerHeight={headerHeight} mode="peek" />
+            </div>
+          </div>
         )}
+
+
       </main>
     </div>
   );

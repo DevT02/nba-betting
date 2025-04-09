@@ -1,37 +1,44 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Info } from "lucide-react"
+import * as React from "react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 
 export const InfoTooltip = ({
   text,
   className,
   isMobile = false
 }: {
-  text: React.ReactNode
-  className?: string
-  isMobile?: boolean
+  text: React.ReactNode;
+  className?: string;
+  isMobile?: boolean;
 }) => {
-  const [open, setOpen] = React.useState(false)
-  const isMobileDevice = isMobile || false
-
+  const [open, setOpen] = React.useState(false);
+  const isMobileDevice = isMobile || false;
+  // If on mobile and the tooltip is open, automatically close it after 5 seconds.
   React.useEffect(() => {
-    if (!isMobileDevice) return
-    const close = () => setOpen(false)
-    document.addEventListener("click", close)
-    return () => document.removeEventListener("click", close)
-  }, [])
+    if (!isMobileDevice) return;
+    if (open) {
+      const timer = setTimeout(() => {
+        setOpen(false);
+      }, 6000); 
+      return () => clearTimeout(timer);
+    }
+  }, [open, isMobileDevice]);
 
   const handleClick = (e: React.MouseEvent) => {
     if (isMobileDevice) {
-      e.stopPropagation()
-      setOpen((prev) => !prev)
+      e.stopPropagation();
+      setOpen((prev) => !prev);
     }
-  }
+  };
 
   return (
-    <Tooltip open={isMobileDevice ? open : undefined} onOpenChange={setOpen} delayDuration={100}>
+    <Tooltip
+      open={isMobileDevice ? open : undefined}
+      onOpenChange={setOpen}
+      delayDuration={100}
+    >
       <TooltipTrigger asChild>
         <Info
           className={`h-3.5 w-3.5 inline-flex items-center -mt-0.5 flex-shrink-0 ml-1 ${
@@ -51,8 +58,7 @@ export const InfoTooltip = ({
         )}
       </TooltipContent>
     </Tooltip>
-  )
-}
+  );
+};
 
-
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider}
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider };

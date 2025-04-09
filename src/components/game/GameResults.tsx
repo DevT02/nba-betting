@@ -22,18 +22,18 @@ export default async function GameResults() {
             }}
           >
             <p className="text-lg font-semibold">
-              {game.home_team} vs. {game.away_team}
+              {game.away_team} vs. {game.home_team}
             </p>
             <p className="text-sm">
               {new Date(game.commence_time).toLocaleString()}
             </p>
             <p className="text-sm">
-              <span className="text-green-600">Home Win Probability:</span>{" "}
-              {game.home_win_prob.toFixed(2)}
-            </p>
-            <p className="text-sm">
               <span className="text-red-600">Away Win Probability:</span>{" "}
               {game.away_win_prob.toFixed(2)}
+            </p>
+            <p className="text-sm">
+              <span className="text-green-600">Home Win Probability:</span>{" "}
+              {game.home_win_prob.toFixed(2)}
             </p>
           </li>
         ))}

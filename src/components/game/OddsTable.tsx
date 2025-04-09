@@ -206,7 +206,7 @@ const OddsTable = ({ oddsData, isMobileView = false }: OddsTableProps) => {
               >
                 <div className="flex items-center">
                   <span className={`${sortColumn === "kelly" ? "text-primary" : ""}`}>
-                    Bankroll
+                    Recommended Bankroll %
                     <span className="ml-1">{renderSortIcon("kelly")}</span>
                   </span>
                   <div className="ml-1.5">
@@ -215,7 +215,7 @@ const OddsTable = ({ oddsData, isMobileView = false }: OddsTableProps) => {
                         text={
                           <div className="space-y-2">
                             <p>Bankroll percentage (Kelly criterion) shows the optimal fraction of your bankroll to wager.</p>
-                            <p>Positive values indicate potential value; negative values suggest avoiding the bet.</p>
+                            <p>Positive values indicate potential value; zero or negative values suggest avoiding the bet.</p>
                             <p>Long-term, following the kelly criterion yields the best results.</p>
                           </div>
                         }
@@ -286,9 +286,16 @@ const OddsTable = ({ oddsData, isMobileView = false }: OddsTableProps) => {
                       {row.edge}
                     </TableCell>
                     {/* Kelly cell with green/red styling */}
-                    <TableCell className={`py-3 max-[419px]:py-2 max-[419px]:px-2 font-medium ${kellyColorClass(kellyVal)}`}>
-                      {row.kelly || "N/A"}
+                    <TableCell
+                      className={`py-3 max-[419px]:py-2 max-[419px]:px-2 font-medium ${
+                        kellyVal > 0
+                          ? "text-emerald-600 dark:text-emerald-400"
+                          : "text-rose-600 dark:text-rose-400"
+                      }`}
+                    >
+                      {kellyVal > 0 ? `${(kellyVal * 100).toFixed(1)}%` : "0.0%"}
                     </TableCell>
+
                   </TableRow>
                 );
               })

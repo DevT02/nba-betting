@@ -4,7 +4,7 @@ Purely frontend for [iverson.bet](https://www.iverson.bet), a betting analytics 
 
 > ‼️ This project is 100% frontend. It can optionally integrate with a MongoDB backend for extended functionality.  
 
-## 📌 Features
+## Features
 
 - Updated daily game schedules
 - Deep analytical insights behind win probabilties
@@ -12,7 +12,7 @@ Purely frontend for [iverson.bet](https://www.iverson.bet), a betting analytics 
 
 ---
 
-## 📦 Tech Stack
+## Tech Stack
 
 - **Framework:** React / Next.js  
 - **Styling:** Tailwind CSS
@@ -55,7 +55,7 @@ npm install # or npm i
 npm run dev
 ```
 
-## 🧪 Setup Locally (with MongoDB)
+## Setup Locally (with MongoDB)
 #### 1. In the root of the project, create a .env.local file.
 ```env
 MONGODB_URI=your-mongodb-connection-uri

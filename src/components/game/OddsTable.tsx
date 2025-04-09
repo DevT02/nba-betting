@@ -138,6 +138,7 @@ const OddsTable = ({ oddsData, isMobileView = false }: OddsTableProps) => {
                     <TooltipProvider>
                       <InfoTooltip
                         text="This column shows the casino providing the odds."
+                        isMobile={isMobileView}
                       />
                     </TooltipProvider>
                   </div>
@@ -165,6 +166,7 @@ const OddsTable = ({ oddsData, isMobileView = false }: OddsTableProps) => {
                             <p>-200 → bet $200 to win $100.</p>
                           </div>
                         }
+                        isMobile={isMobileView}
                       />
                     </TooltipProvider>
                   </div>
@@ -190,6 +192,7 @@ const OddsTable = ({ oddsData, isMobileView = false }: OddsTableProps) => {
                               <p>Higher positive values indicate better betting opportunities.</p>
                           </div>
                         }
+                        isMobile={isMobileView}
                       />
                     </TooltipProvider>
                   </div>
@@ -216,6 +219,7 @@ const OddsTable = ({ oddsData, isMobileView = false }: OddsTableProps) => {
                             <p>Long-term, following the kelly criterion yields the best results.</p>
                           </div>
                         }
+                        isMobile={isMobileView}
                       />
                     </TooltipProvider>
                   </div>

@@ -36,10 +36,10 @@ const InfoBanner: React.FC<InfoBannerProps> = ({
               className="block text-xl font-semibold text-gray-800 dark:text-gray-100 hover:text-primary transition-colors"
             >
               {article.title}
-            </Link>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
               {article.description || "Learn more by clicking this article."}
             </p>
+            </Link>
           </li>
         ))}
       </ul>

@@ -590,6 +590,38 @@ function GameDetails({
                 ))}
               </Tabs>
             </div>
+                        {/* Prev/Next Buttons placed inside the main content
+                        <div className="flex justify-between my-6">
+                <button
+                  onClick={() => {
+                    if (prevId) router.push(`/gamedetails/${prevId}`);
+                  }}
+                  disabled={!prevId}
+                  className={`px-5 py-2.5 rounded-lg flex items-center gap-2 transition-colors ${
+                    prevId
+                      ? "bg-card hover:bg-accent text-card-foreground border border-border"
+                      : "bg-muted text-muted-foreground cursor-not-allowed border border-border opacity-50"
+                  }`}
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                  <span className="font-medium">Previous</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    if (nextId) router.push(`/gamedetails/${nextId}`);
+                  }}
+                  disabled={!nextId}
+                  className={`px-5 py-2.5 rounded-lg flex items-center gap-2 transition-colors ${
+                      nextId
+                        ? "bg-card hover:bg-accent text-card-foreground border border-border"
+                        : "bg-muted text-muted-foreground cursor-not-allowed border border-border opacity-50"
+                    }`}
+                  >
+                  <span className="font-medium">Next</span>
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </div> */}
           </motion.div>
         ) : (
           /* ------------------- DESKTOP LAYOUT ----------------------- */
@@ -960,7 +992,40 @@ function GameDetails({
                   ))}
                 </Tabs>
               </div>
+              {/* Prev/Next Buttons placed inside the main content */}
+              <div className="flex justify-between my-6">
+                <button
+                  onClick={() => {
+                    if (prevId) router.push(`/gamedetails/${prevId}`);
+                  }}
+                  disabled={!prevId}
+                  className={`px-5 py-2.5 rounded-lg flex items-center gap-2 transition-colors ${
+                    prevId
+                      ? "bg-card hover:bg-accent text-card-foreground border border-border"
+                      : "bg-muted text-muted-foreground cursor-not-allowed border border-border opacity-50"
+                  }`}
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                  <span className="font-medium">Previous</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    if (nextId) router.push(`/gamedetails/${nextId}`);
+                  }}
+                  disabled={!nextId}
+                  className={`px-5 py-2.5 rounded-lg flex items-center gap-2 transition-colors ${
+                      nextId
+                        ? "bg-card hover:bg-accent text-card-foreground border border-border"
+                        : "bg-muted text-muted-foreground cursor-not-allowed border border-border opacity-50"
+                    }`}
+                  >
+                  <span className="font-medium">Next</span>
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </div>
             </div>
+
 
             {/* Right Sidebar (InfoBanner) */}
             <aside className="hidden xl:block col-span-2 ">
@@ -968,39 +1033,6 @@ function GameDetails({
             </aside>
           </div>
         )}
-
-        {/* Prev/Next Buttons */}
-        <div className="flex justify-between my-6">
-          <button
-            onClick={() => {
-              if (prevId) router.push(`/gamedetails/${prevId}`);
-            }}
-            disabled={!prevId}
-            className={`px-5 py-2.5 rounded-lg flex items-center gap-2 transition-colors ${
-              prevId
-                ? "bg-card hover:bg-accent text-card-foreground border border-border"
-                : "bg-muted text-muted-foreground cursor-not-allowed border border-border opacity-50"
-            }`}
-          >
-            <ChevronLeft className="h-5 w-5" />
-            <span className="font-medium">Previous</span>
-          </button>
-
-          <button
-            onClick={() => {
-              if (nextId) router.push(`/gamedetails/${nextId}`);
-            }}
-            disabled={!nextId}
-            className={`px-5 py-2.5 rounded-lg flex items-center gap-2 transition-colors ${
-              nextId
-                ? "bg-card hover:bg-accent text-card-foreground border border-border"
-                : "bg-muted text-muted-foreground cursor-not-allowed border border-border opacity-50"
-            }`}
-          >
-            <span className="font-medium">Next</span>
-            <ChevronRight className="h-5 w-5" />
-          </button>
-        </div>
       </main>
     </div>
   );

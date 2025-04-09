@@ -54,8 +54,11 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
               <div
                 key={preview._id}
                 onClick={() => router.push(`/gamedetails/${preview._id}`)}
-                className="cursor-pointer p-3 bg-card shadow-sm hover:shadow-md rounded-md border border-border relative transition-all duration-150"
+                className="cursor-pointer p-3 bg-card shadow-sm hover:shadow-md rounded-md border border-border relative transition-all duration-200 hover:scale-[1.02] group"
               >
+                <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-primary to-secondary rounded-md pointer-events-none"
+                  style={{ clipPath: "polygon(0 0, 100% 0, 85% 100%, 0 100%)" }}
+                ></div>
                 <div className="flex items-center gap-2">
                   <img
                     src={getTeamLogo(preview.away_team)}
@@ -104,7 +107,7 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
       <hr className="my-4 border-border" />
       {/* Upcoming Games Section */}
       <div className="mb-4">
-        <h3 className="text-lg font-bold mb-2 text-gray-800 dark:text-gray-100">
+        <h3 className="ml-1 text-lg font-bold mb-2 text-gray-800 dark:text-gray-100">
           Upcoming Games
         </h3>
       </div>

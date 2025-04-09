@@ -46,6 +46,10 @@ export default function GameDetailsLoading() {
             <div className="w-4 h-4 bg-gray-300 dark:bg-gray-700 rounded-full" />
             <div className="h-4 w-24 bg-gray-300 dark:bg-gray-700 rounded" />
           </div>
+          <div className="flex items-center gap-2 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-full">
+            <div className="w-4 h-4 bg-gray-300 dark:bg-gray-700 rounded-full" />
+            <div className="h-4 w-24 bg-gray-300 dark:bg-gray-700 rounded" />
+          </div>
         </div>
 
         {/*H2H Section */}

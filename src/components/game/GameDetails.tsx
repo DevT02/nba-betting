@@ -627,7 +627,7 @@ function GameDetails({
           /* ------------------- DESKTOP LAYOUT ----------------------- */
           <div className="grid grid-cols-12 gap-6">
             {/* Left Sidebar (PreviewBanner) */}
-            <aside className="hidden xl:block col-span-2 ">
+            <aside className="hidden xl:block col-span-3 ">
               <PreviewBanner
                 todayPreviews={todayPreviews}
                 upcomingPreviews={upcomingPreviews}
@@ -636,7 +636,7 @@ function GameDetails({
             </aside>
 
             {/* Main Content (Center) */}
-            <div className="col-span-12 xl:col-span-8">
+            <div className="col-span-12 xl:col-span-6">
               <div
                 className="rounded-2xl shadow-lg border border-gray-200 dark:border-zinc-800
                            p-6 sm:p-8 md:p-12 min-h-[550px] flex flex-col justify-between"

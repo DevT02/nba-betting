@@ -1,4 +1,3 @@
-// src/components/game/PreviewBanner.tsx
 "use client";
 import React, { useState } from "react";
 import { format } from "date-fns";
@@ -34,18 +33,17 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
       : upcomingPreviews;
 
   return (
-    <div
-      className="bg-background p-4 border rounded-lg shadow-sm overflow-auto"
-    >
+    <div className="bg-background p-4 border rounded-lg shadow-sm overflow-auto">
       {/* Today's Games Section */}
       <div className="mb-4">
         <h3 className="text-lg font-bold mb-2 text-gray-800 dark:text-gray-100">
           Today's Games
         </h3>
       </div>
-      <div className="space-y-4">
+      {/* Change from vertical stack to grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {todayPreviews.length === 0 ? (
-          <p className="text-xs text-center">No games today.</p>
+          <p className="text-xs text-center col-span-full">No games today.</p>
         ) : (
           todayToShow.map((preview) => {
             const gameTime = new Date(preview.commence_time);
@@ -54,11 +52,13 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
               <div
                 key={preview._id}
                 onClick={() => router.push(`/gamedetails/${preview._id}`)}
-                className="cursor-pointer p-3 bg-gradient-to-br shadow-sm hover:shadow-md rounded-md border border-border relative transition-all duration-200 hover:scale-[1.02] group"
+                className="cursor-pointer p-3 bg-card shadow-sm hover:shadow-md rounded-md border border-border relative transition-all duration-200 hover:scale-[1.02] group"
               >
-                <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-primary to-secondary rounded-md pointer-events-none"
+                {/* Gradient overlay with triangle effect */}
+                <div
+                  className="absolute inset-0 opacity-5 bg-gradient-to-br from-primary to-secondary rounded-md pointer-events-none"
                   style={{ clipPath: "polygon(0 0, 100% 0, 85% 100%, 0 100%)" }}
-                ></div>
+                />
                 <div className="flex items-center gap-2">
                   <img
                     src={getTeamLogo(preview.away_team)}
@@ -93,27 +93,29 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
             );
           })
         )}
-        {todayPreviews.length > PREVIEW_LIMIT && (
-          <div className="text-center">
-            <button
-              onClick={() => setTodayExpanded(!todayExpanded)}
-              className="text-sm text-blue-500 hover:underline"
-            >
-              {todayExpanded ? "Show Less" : "Show More"}
-            </button>
-          </div>
-        )}
       </div>
+      {todayPreviews.length > PREVIEW_LIMIT && (
+        <div className="text-center mt-4">
+          <button
+            onClick={() => setTodayExpanded(!todayExpanded)}
+            className="text-sm text-blue-500 hover:underline"
+          >
+            {todayExpanded ? "Show Less" : "Show More"}
+          </button>
+        </div>
+      )}
+
       <hr className="my-4 border-border" />
+
       {/* Upcoming Games Section */}
       <div className="mb-4">
         <h3 className="ml-1 text-lg font-bold mb-2 text-gray-800 dark:text-gray-100">
           Upcoming Games
         </h3>
       </div>
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {upcomingPreviews.length === 0 ? (
-          <p className="text-xs text-center">No upcoming games.</p>
+          <p className="text-xs text-center col-span-full">No upcoming games.</p>
         ) : (
           upcomingToShow.map((preview) => {
             const gameTime = new Date(preview.commence_time);
@@ -154,17 +156,17 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
             );
           })
         )}
-        {upcomingPreviews.length > PREVIEW_LIMIT && (
-          <div className="text-center">
-            <button
-              onClick={() => setUpcomingExpanded(!upcomingExpanded)}
-              className="text-sm text-blue-500 hover:underline"
-            >
-              {upcomingExpanded ? "Show Less" : "Show More"}
-            </button>
-          </div>
-        )}
       </div>
+      {upcomingPreviews.length > PREVIEW_LIMIT && (
+        <div className="text-center mt-4">
+          <button
+            onClick={() => setUpcomingExpanded(!upcomingExpanded)}
+            className="text-sm text-blue-500 hover:underline"
+          >
+            {upcomingExpanded ? "Show Less" : "Show More"}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

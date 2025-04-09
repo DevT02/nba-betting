@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { getCasinoLogo } from "@/lib/casinoLogoMap";
 import { ChevronUp, ChevronDown } from "lucide-react";
+import { InfoTooltip, TooltipProvider } from "@/components/utils/ToolTipComponent";
 
 type OddsTableProps = {
   oddsData: OddsRow[];
@@ -123,42 +124,102 @@ const OddsTable = ({ oddsData, isMobileView = false }: OddsTableProps) => {
         <Table className="w-full text-sm max-[419px]:text-xs">
           <TableHeader className="sticky top-0 z-10 bg-gradient-to-r from-background to-primary/5">
             <TableRow className="border-b border-border bg-card hover:bg-card">
-              {/* Casino column with Best badge */}
+              {/* Casino column */}
               <TableHead
-                className="min-w-[70px] max-[419px]:min-w-[60px] sm:w-1/4 font-medium text-foreground cursor-pointer relative group transition-colors max-[419px]:py-2 max-[419px]:px-2"
+                className="min-w-[70px] max-[419px]:min-w-[60px] sm:w-1/4 font-medium text-foreground cursor-pointer relative transition-colors max-[419px]:py-2 max-[419px]:px-2 py-3 px-3"
                 onClick={() => handleSort("book")}
               >
-                <span className={sortColumn === "book" ? "text-primary" : ""}>
-                  <span className="sm:inline">Casino</span> {renderSortIcon("book")}
-                </span>
+                <div className="flex items-center">
+                  <span className={`${sortColumn === "book" ? "text-primary" : ""}`}>
+                    <span className="sm:inline">Casino</span>
+                    <span className="ml-1">{renderSortIcon("book")}</span>
+                  </span>
+                  <div className="ml-1.5">
+                    <TooltipProvider>
+                      <InfoTooltip
+                        text="This column shows the casino providing the odds."
+                      />
+                    </TooltipProvider>
+                  </div>
+                </div>
               </TableHead>
-              {/* Money column */}
+
+              {/* Moneyline column */}
               <TableHead
-                className="min-w-[60px] max-[419px]:min-w-[50px] sm:w-1/4 font-medium text-foreground cursor-pointer relative group transition-colors max-[419px]:py-2 max-[419px]:px-2"
+                className="min-w-[60px] max-[419px]:min-w-[50px] sm:w-1/4 font-medium text-foreground cursor-pointer relative transition-colors max-[419px]:py-2 max-[419px]:px-2 py-3 px-3"
                 onClick={() => handleSort("moneyline")}
               >
-                <span className={sortColumn === "moneyline" ? "text-primary" : ""}>
-                  <span className="hidden sm:inline">Money</span>
-                  <span className="sm:hidden">ML</span> {renderSortIcon("moneyline")}
-                </span>
+                <div className="flex items-center">
+                  <span className={`${sortColumn === "moneyline" ? "text-primary" : ""}`}>
+                    <span className="hidden sm:inline">Moneyline</span>
+                    <span className="sm:hidden">ML</span>
+                    <span className="ml-1">{renderSortIcon("moneyline")}</span>
+                  </span>
+                  <div className="ml-1.5">
+                    <TooltipProvider>
+                      <InfoTooltip
+                        text={
+                          <div className="space-y-2">
+                            <p>Moneyline shows potential profit:</p>
+                            <p>+150 → bet $100, win $150.</p>
+                            <p>-200 → bet $200 to win $100.</p>
+                          </div>
+                        }
+                      />
+                    </TooltipProvider>
+                  </div>
+                </div>
               </TableHead>
-              {/* Edge column (now second-to-last) */}
+
+              {/* Edge column */}
               <TableHead
-                className="min-w-[60px] max-[419px]:min-w-[50px] sm:w-1/4 font-medium text-foreground cursor-pointer relative group transition-colors max-[419px]:py-2 max-[419px]:px-2"
+                className="min-w-[60px] max-[419px]:min-w-[50px] sm:w-1/4 font-medium text-foreground cursor-pointer relative transition-colors max-[419px]:py-2 max-[419px]:px-2 py-3 px-3"
                 onClick={() => handleSort("edge")}
               >
-                <span className={sortColumn === "edge" ? "text-primary" : ""}>
-                  Edge {renderSortIcon("edge")}
-                </span>
+                <div className="flex items-center">
+                  <span className={`${sortColumn === "edge" ? "text-primary" : ""}`}>
+                    Edge
+                    <span className="ml-1">{renderSortIcon("edge")}</span>
+                  </span>
+                  <div className="ml-1.5">
+                    <TooltipProvider>
+                      <InfoTooltip
+                        text={
+                          <div className="space-y-2">
+                              <p>Edge represents the estimated percentage advantage compared to fair market value.</p>
+                              <p>Higher positive values indicate better betting opportunities.</p>
+                          </div>
+                        }
+                      />
+                    </TooltipProvider>
+                  </div>
+                </div>
               </TableHead>
-              {/* Kelly column (now last) */}
+
+              {/* Bankroll column */}
               <TableHead
-                className="min-w-[60px] max-[419px]:min-w-[50px] sm:w-1/4 font-medium text-foreground cursor-pointer relative group transition-colors max-[419px]:py-2 max-[419px]:px-2"
+                className="min-w-[60px] max-[419px]:min-w-[50px] sm:w-1/4 font-medium text-foreground cursor-pointer relative transition-colors max-[419px]:py-2 max-[419px]:px-2 py-3 px-3"
                 onClick={() => handleSort("kelly")}
               >
-                <span className={sortColumn === "kelly" ? "text-primary" : ""}>
-                  Kelly {renderSortIcon("kelly")}
-                </span>
+                <div className="flex items-center">
+                  <span className={`${sortColumn === "kelly" ? "text-primary" : ""}`}>
+                    Bankroll
+                    <span className="ml-1">{renderSortIcon("kelly")}</span>
+                  </span>
+                  <div className="ml-1.5">
+                    <TooltipProvider>
+                      <InfoTooltip
+                        text={
+                          <div className="space-y-2">
+                            <p>Bankroll percentage (Kelly criterion) shows the optimal fraction of your bankroll to wager.</p>
+                            <p>Positive values indicate potential value; negative values suggest avoiding the bet.</p>
+                            <p>Long-term, following the kelly criterion yields the best results.</p>
+                          </div>
+                        }
+                      />
+                    </TooltipProvider>
+                  </div>
+                </div>
               </TableHead>
             </TableRow>
           </TableHeader>

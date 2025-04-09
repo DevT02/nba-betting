@@ -1,6 +1,9 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TooltipProvider, InfoTooltip } from "@/components/utils/ToolTipComponent"
+
 import { useRouter } from "next/navigation";
 import OddsTable from "./OddsTable";
 import Header from "./Header";
@@ -14,14 +17,18 @@ import {
   ChevronRight,
   CalendarIcon,
 } from "lucide-react";
-import { useUserTimeZone } from "@/lib/timeZone";
 import PreviewBanner from "./PreviewBanner";
+
 import { useAdjacentGameNavigation } from "@/hooks/useAdjacentGameNavigation";
 import { usePreviewMode } from "@/hooks/usePreviewMode";
+
 import { GameDetailsProps } from "@/types/game";
+
 import { motion } from "framer-motion";
 import GameSelector from "./mobile/GameSelector";
+
 import { getShortTeamName } from "@/lib/teamNameMap";
+import { useUserTimeZone } from "@/lib/timeZone";
 
 function GameDetails({
   teamNames,

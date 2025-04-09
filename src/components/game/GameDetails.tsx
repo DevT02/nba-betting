@@ -600,6 +600,18 @@ function GameDetails({
                     <span className="hidden sm:inline">{bestTeam}</span>
                     <span className="inline sm:hidden">{getShortTeamName(bestTeam)}</span>
                     <span className="text-yellow-600 dark:text-yellow-400"> predicted to win!</span>
+                    <TooltipProvider>
+                      <InfoTooltip 
+                        text={
+                          <div>
+                            <p>This prediction is based on our Iverson 1.1 model.</p>
+                            <div className="h-2"></div>
+                            <p>Our model analyzes team performance over a season along with historical matchups to bring you the best results.</p>
+                          </div>
+                        }
+                        className="text-muted-foreground ml-2 -mt-0.5"
+                      />
+                    </TooltipProvider>
                   </h3>
                 </div>
                 

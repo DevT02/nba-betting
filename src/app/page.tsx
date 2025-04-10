@@ -1,5 +1,7 @@
+// src/app/page.tsx
 import Header from "@/components/game/Header";
 import Link from "next/link";
+import InfoBanner from "@/components/game/InfoBanner"; // Newly imported for the sidebar
 
 import { formatInTimeZone } from "date-fns-tz";
 import { addDays } from "date-fns";
@@ -9,7 +11,6 @@ import { getEvResults, getUpcomingGames } from "@/lib/staticCache";
 import { getTeamLogo } from "@/lib/teamNameMap";
 import { deduplicateGames } from "@/lib/utils";
 
-import GamesGrid from "@/components/game/GamesGrid";
 import GamesGridWrapper from "@/components/game/GamesGridWrapper";
 import TimeZoneSync from '@/components/utils/TimeZoneSync';
 
@@ -17,12 +18,15 @@ export default async function Home({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {  
+}) {
   const sp = await searchParams;
   const { tab, tz } = sp;
 
+  // Set active tab and time zone
   const activeTab = Array.isArray(tab) ? tab[0] || "Featured" : tab || "Featured";
   const timeZone = Array.isArray(tz) ? tz[0] : tz || "America/New_York";
+
+  // Get today's and tomorrow's boundaries based on the time zone
   const now = new Date();
   const startTodayStr = formatInTimeZone(now, timeZone, "yyyy-MM-dd'T'00:00:00XXX");
   const endTodayStr = formatInTimeZone(now, timeZone, "yyyy-MM-dd'T'23:59:59XXX");
@@ -31,11 +35,12 @@ export default async function Home({
   const endTomorrowStr = formatInTimeZone(tomorrow, timeZone, "yyyy-MM-dd'T'23:59:59XXX");
   const sevenDaysLater = addDays(now, 7);
   const upcomingGames = await getUpcomingGames();
-
   const evResults = await getEvResults();
   let games: any[] = [];
 
+  // Filter games based on the selected tab
   if (activeTab === "Featured") {
+    // For featured, group today’s games and choose the ones with the best win probability
     const groupedGames = new Map<string, any>();
     for (const game of evResults) {
       const gameTime = new Date(game.commence_time);
@@ -67,11 +72,8 @@ export default async function Home({
       return gameTime >= new Date(startTomorrowStr) && gameTime <= new Date(endTomorrowStr);
     });
   } else if (activeTab === "Upcoming") {
-    // For upcoming, filter games from now until seven days later.
     games = evResults.filter((game) => {
       const gameTime = new Date(game.commence_time);
-      // gameTime > new Date(endTodayStr) && gameTime <= sevenDaysLater  if we want to include only games after today
-      // but for now to include all games within the next 7 days from now, we can use the following condition:
       return gameTime >= now && gameTime <= sevenDaysLater;
     });
   }
@@ -82,7 +84,27 @@ export default async function Home({
       return await mergeArenaInfo(game, upcomingGames);
     })
   );
-  games = JSON.parse(JSON.stringify(games)); // for json serialization
+  games = JSON.parse(JSON.stringify(games)); // for JSON serialization
+  let headingText = "";
+  let subHeading = "";
+  switch (activeTab) {
+    case "Featured":
+      headingText = "Featured Games";
+      subHeading = "Curated top match-ups based on high-value odds.";
+      break;
+    case "Today":
+      headingText = "Games Today";
+      subHeading = "All the games happening today.";
+      break;
+    case "Tomorrow":
+      headingText = "Games Tomorrow";
+      subHeading = "Catch tomorrow's games and get ready to bet early!";
+      break;
+    case "Upcoming":
+      headingText = "Upcoming Games (Next 7 Days)";
+      subHeading = "All upcoming games from today until 7 days ahead.";
+      break;
+  }
 
   return (
     <div
@@ -94,24 +116,41 @@ export default async function Home({
     >
       <TimeZoneSync />
       <Header />
-      <div className="flex-1 w-full max-w-6xl mx-auto px-4 flex flex-col gap-4">
-        <div className="pt-4 flex items-center gap-6">
-          {["Featured", "Today", "Tomorrow", "Upcoming"].map((tabName) => (
-            <Link
-              key={tabName}
-              href={`/?tab=${tabName}`}
-              className={`font-medium pb-1 border-b-2 ${
-                activeTab === tabName
-                  ? "border-red-500 dark:border-red-300"
-                  : "border-transparent text-gray-500 dark:text-gray-400"
-              }`}
-            >
-              {tabName}
-            </Link>
-          ))}
+      <div className="flex-1 w-full px-4 sm:px-6 lg:px-8 flex flex-col gap-4 xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto">
+        {/* tab nav left-aligned */}
+        <div className="pt-5 flex flex-col gap-2">
+          <div className="flex items-center gap-6">
+            {["Featured", "Today", "Tomorrow", "Upcoming"].map((tabName) => (
+              <Link
+                key={tabName}
+                href={`/?tab=${tabName}`}
+                className={`font-medium pb-1 border-b-2 transition-all duration-200 ${
+                  activeTab === tabName
+                    ? "border-red-500 dark:border-red-300 text-gray-900 dark:text-gray-100"
+                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600"
+                }`}
+              >
+                {tabName}
+              </Link>
+            ))}
+          </div>
+          <div className="w-full h-px bg-border dark:bg-zinc-800"></div>
         </div>
 
-        <GamesGridWrapper games={games} activeTab={activeTab} />
+        {/* heading as to what it is */}
+        <div className="mt-4 text-left">
+          <h2 className="text-2xl font-bold">{headingText}</h2>
+          <p className="text-sm text-muted-foreground">{subHeading}</p>
+        </div>
+        {/* grid layout - lg up screens dont have enough content */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="col-span-12 lg:col-span-8">
+            <GamesGridWrapper games={games} activeTab={activeTab} />
+          </div>
+          <aside className="hidden lg:block lg:col-span-4">
+            <InfoBanner headerHeight={80} />
+          </aside>
+        </div>
       </div>
     </div>
   );

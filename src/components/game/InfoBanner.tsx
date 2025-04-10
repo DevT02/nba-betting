@@ -12,7 +12,7 @@ const InfoBanner: React.FC<InfoBannerProps> = ({
 }) => {
   return (
     <div
-      className="bg-background p-4 border rounded-lg shadow-sm overflow-auto"
+      className="bg-card p-4 border rounded-lg shadow-sm overflow-auto"
     >
       <h2 className="text-2xl font-extrabold mb-5 text-primary">
         Helpful Articles & Info

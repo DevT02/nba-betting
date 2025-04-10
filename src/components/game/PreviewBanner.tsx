@@ -35,7 +35,7 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
 
   return (
     <div
-      className="bg-background p-4 border rounded-lg shadow-sm overflow-auto"
+      className="bg-card p-4 border rounded-lg shadow-sm overflow-auto"
     >
       {/* Today's Games Section */}
       <div className="mb-4">
@@ -122,8 +122,11 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
               <div
                 key={preview._id}
                 onClick={() => router.push(`/gamedetails/${preview._id}`)}
-                className="cursor-pointer p-3 bg-card shadow-sm hover:shadow-md rounded-md border border-border relative transition-all duration-150"
+                className="cursor-pointer p-3 bg-gradient-to-br shadow-sm hover:shadow-md rounded-md border border-border relative transition-all duration-200 hover:scale-[1.02] group"
               >
+                <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-primary to-secondary rounded-md pointer-events-none"
+                  style={{ clipPath: "polygon(0 0, 100% 0, 85% 100%, 0 100%)" }}
+                ></div>
                 <div className="flex items-center gap-2">
                   <img
                     src={getTeamLogo(preview.away_team)}

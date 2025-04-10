@@ -223,7 +223,24 @@ function GameDetails({
       {(isMobile || isTablet) && gameIds && gamePreviews && (
         <div className="px-4 sm:px-6 lg:px-8 mt-2">
           <GameSelector
-            games={gameIds.map((id) => gamePreviews[id]).filter(Boolean)}
+            games={gameIds
+              .map((id) => gamePreviews[id])
+              .filter(Boolean)
+              .filter((game) => {
+                const gameTime = new Date(game.commence_time);
+                const now = new Date();
+                const gameDay = new Date(
+                  gameTime.getFullYear(),
+                  gameTime.getMonth(),
+                  gameTime.getDate()
+                );
+                const today = new Date(
+                  now.getFullYear(),
+                  now.getMonth(),
+                  now.getDate()
+                );
+                return gameDay >= today;
+              })}
             currentGameId={currentGameId}
           />
         </div>

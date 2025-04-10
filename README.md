@@ -1,4 +1,4 @@
-# Iverson.bet 🏀
+# iverson.bet 🏀
 
 Purely frontend for [iverson.bet](https://www.iverson.bet), a betting analytics platform that visualizes edges, optimal bankroll wagers, and other sharp metrics across sportsbooks.
 

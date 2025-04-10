@@ -30,6 +30,8 @@ import GameSelector from "./mobile/GameSelector";
 
 import { getShortTeamName } from "@/lib/teamNameMap";
 import { useUserTimeZone } from "@/lib/timeZone";
+import Articles from "../Articles";
+import { articleData } from "../ArticleData";
 
 function GameDetails({
   teamNames,
@@ -150,13 +152,16 @@ function GameDetails({
 
   // Track screen size
   const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const handleResize = () => setIsMobile(window.innerWidth < 768);
-      handleResize();
-      window.addEventListener("resize", handleResize);
-      return () => window.removeEventListener("resize", handleResize);
-    }
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 768);
+      setIsTablet(width >= 768 && width < 1280);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const [isLargeScreen, setIsLargeScreen] = useState(false);
@@ -215,7 +220,7 @@ function GameDetails({
       <Header />
 
       {/* Mobile-only game selector */}
-      {isMobile && gameIds && gamePreviews && (
+      {(isMobile || isTablet) && gameIds && gamePreviews && (
         <div className="px-4 sm:px-6 lg:px-8 mt-2">
           <GameSelector
             games={gameIds.map((id) => gamePreviews[id]).filter(Boolean)}
@@ -225,7 +230,7 @@ function GameDetails({
       )}
 
       <main className="mx-auto px-4 sm:px-6 lg:px-8 mt-6 max-w-none">
-        {isMobile ? (
+        {(isMobile || isTablet) ? (
           /* --------------------- MOBILE LAYOUT ----------------------- */
           <motion.div
             drag="x"
@@ -625,7 +630,7 @@ function GameDetails({
           </motion.div>
         ) : (
           /* ------------------- DESKTOP LAYOUT ----------------------- */
-          <div className="grid grid-cols-12 gap-6">
+          <div className="grid grid-cols-12">
             {/* Left Sidebar (PreviewBanner) */}
             <aside className="hidden xl:block col-span-2 ">
               <PreviewBanner
@@ -637,360 +642,362 @@ function GameDetails({
 
             {/* Main Content (Center) */}
             <div className="col-span-12 xl:col-span-8">
-              <div
-                className="rounded-2xl shadow-lg border border-gray-200 dark:border-zinc-800
-                           p-6 sm:p-8 md:p-12 min-h-[550px] flex flex-col justify-between"
-                style={{
-                  backgroundColor: "hsl(var(--card))",
-                  color: "hsl(var(--card-foreground))",
-                }}
-              >
-                <div className="flex flex-col items-center gap-6 mb-8">
-                  {/* Header: Teams */}
-                  <h1 className="font-bold text-center">
-                    <div className="flex flex-col items-center gap-6 mb-1">
-                      <h1 className="font-bold text-center">
-                        <div className="flex items-center justify-center gap-2 sm:gap-4 flex-nowrap">
-                          <img
-                            src={logoLeft}
-                            alt={`${awayTeam} logo`}
-                            className="w-8 h-8 max-[319px]:w-6 max-[319px]:h-6 sm:w-10 sm:h-10 md:w-12 md:h-12"
-                          />
-                          <span className="block max-[319px]:block hidden max-[319px]:whitespace-normal
-                                           max-[319px]:max-w-[120px] max-[319px]:text-[0.65rem]
-                                           overflow-hidden truncate"
-                          >
-                            {getShortTeamName(awayTeam)} vs. {getShortTeamName(homeTeam)}
-                          </span>
-                          <span className="whitespace-nowrap text-[0.75rem] max-[319px]:hidden
-                                           text-xl sm:text-2xl md:text-3xl lg:text-4xl
-                                           overflow-hidden truncate"
-                          >
-                            {awayTeam} vs. {homeTeam}
-                          </span>
-                          <img
-                            src={logoRight}
-                            alt={`${homeTeam} logo`}
-                            className="w-8 h-8 max-[319px]:w-6 max-[319px]:h-6 sm:w-10 sm:h-10 md:w-12 md:h-12"
-                          />
-                        </div>
-                      </h1>
-                    </div>
-                  </h1>
-
-                  {/* Info Chips: Date, Time, Location */}
-                  <div className="flex flex-wrap items-center justify-center gap-3 text-xs sm:text-sm">
-                    <div className="flex items-center gap-2 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-full">
-                      <CalendarIcon className="h-4 w-4 text-indigo-500" />
-                      <span className="font-medium">{formattedDate}</span>
-                    </div>
-                    <div className="flex items-center gap-2 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-full">
-                      <ClockIcon className="h-4 w-4 text-red-500" />
-                      <span className="font-medium">{formattedTime}</span>
-                    </div>
-                    <div className="flex items-center gap-2 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-full">
-                      <MapPinIcon className="h-4 w-4 text-blue-500" />
-                      <span className="font-medium">
-                        {gameDetails.arena || "TBD"}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Scrollable info row */}
-                  <div className="py-1 w-full">
-                    <div className="border-t border-b border-gray-100 dark:border-gray-800/50 relative">
-                      {showLeftGradient && (
-                        <div className="absolute left-0 top-0 bottom-0 w-6
-                                        bg-gradient-to-r from-white dark:from-zinc-900 to-transparent
-                                        pointer-events-none z-10"
-                        />
-                      )}
-                      <div
-                        ref={scrollContainerRef}
-                        className="py-3 flex items-center justify-center gap-x-6 sm:gap-x-8
-                                   overflow-x-auto whitespace-nowrap px-4 text-xs sm:text-sm scroll-pl-4"
-                        onScroll={handleScroll}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-purple-500 dark:text-purple-400">
-                            H2H:
-                          </span>
-                          <span className="text-xs">{gameDetails.h2h_record}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <TrendingUpIcon className="h-4 w-4 text-green-500 dark:text-green-400" />
-                          <span className="text-xs">{gameDetails.over_under}</span>
-                        </div>
-                        {gameDetails.player_injury && (
-                          <div className="flex items-center gap-2">
-                            <AlertTriangleIcon className="h-4 w-4 text-red-500 dark:text-red-400" />
-                            <span className="text-xs">
-                              {gameDetails.player_injury}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Desktop "Prediction" Section */}
-                  <div
-                    className="flex flex-col items-center gap-2.5 border border-yellow-200
-                               dark:border-yellow-900/50 p-3 sm:p-4 rounded-xl w-full mx-auto
-                               bg-gradient-to-b from-yellow-50/40 to-transparent dark:from-yellow-900/20
-                               shadow-sm"
-                  >
-                    {/* Trophy + Title */}
-                    <div className="flex items-center justify-center gap-1.5 w-full">
-                      <div className="flex-shrink-0 bg-yellow-100 dark:bg-yellow-900/30 p-1 sm:p-1.5 rounded-full">
-                        <FaTrophy className="text-yellow-500 dark:text-yellow-400 h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                      </div>
-                      <h3 className="font-bold text-sm sm:text-base text-center">
-                        <span className="hidden sm:inline">{bestTeam}</span>
-                        <span className="inline sm:hidden">
-                          {getShortTeamName(bestTeam)}
-                        </span>
-                        <span className="text-yellow-600 dark:text-yellow-400"> predicted to win!</span>
-                        <TooltipProvider>
-                          <InfoTooltip
-                            text={
-                              <div>
-                                <p>This prediction is based on our Iverson 1.1 model.</p>
-                                <div className="h-2"></div>
-                                <p>
-                                  Our model analyzes team performance over a season along with
-                                  historical matchups to bring you the best results.
-                                </p>
-                              </div>
-                            }
-                            className="text-muted-foreground ml-2 -mt-0.5"
-                          />
-                        </TooltipProvider>
-                      </h3>
-                    </div>
-
-                    {/* Probability bars & Favored/Underdog labels */}
-                    <div className="w-full bg-white/50 dark:bg-black/10 rounded-lg p-2.5 sm:p-3 relative">
-                      {/* Teams row */}
-                      <div className="flex justify-between items-center mb-3 relative">
-                        {orderedTeamNames.map((team, index) => {
-                          const probability = parseFloat(
-                            oddsData[team][0]?.probability?.replace("%", "") || "0"
-                          );
-                          const isWinner = team === bestTeam;
-                          const isRightTeam = index === 1;
-                          return (
-                            <div
-                              key={team}
-                              className={`flex items-center gap-2 ${
-                                isRightTeam ? "flex-row-reverse" : ""
-                              }`}
-                            >
-                              <div
-                                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full p-1 flex items-center justify-center
-                                            shadow-sm ${
-                                              isWinner
-                                                ? "bg-green-100 dark:bg-green-900/30 ring-1 ring-green-200 dark:ring-green-900/50"
-                                                : "bg-red-100 dark:bg-red-900/30 ring-1 ring-red-200 dark:ring-red-900/50"
-                                            }`}
-                              >
-                                <img
-                                  src={logos?.[team] ?? getTeamLogo(team)}
-                                  alt={`${team} logo`}
-                                  className="w-full h-full object-contain"
-                                />
-                              </div>
-                              <div>
-                                <div className="font-medium text-xs sm:text-sm">
-                                  <span className="hidden sm:inline">{team}</span>
-                                  <span className="inline sm:hidden">
-                                    {getShortTeamName(team)}
-                                  </span>
-                                </div>
-                                <div
-                                  className={`text-xs sm:text-sm font-semibold ${
-                                    isRightTeam ? "text-right" : "text-left"
-                                  } ${
-                                    isWinner
-                                      ? "text-green-600 dark:text-green-400"
-                                      : "text-red-600 dark:text-red-400"
-                                  }`}
-                                >
-                                  {oddsData[team][0]?.probability || "N/A"}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-
-                        {/* VS marker */}
-                        <div
-                          className="absolute left-1/2 top-1/2 transform
-                                     -translate-x-1/2 -translate-y-1/2"
-                        >
-                          <div
-                            className="bg-gradient-to-b from-white to-gray-50 dark:from-gray-700
-                                       dark:to-gray-800 rounded-full h-5 w-5 sm:h-6 sm:w-6
-                                       flex items-center justify-center shadow-md
-                                       border-2 border-yellow-100 dark:border-yellow-900/50"
-                          >
-                            <span
-                              className="text-[9px] sm:text-[10px] font-extrabold
-                                         bg-clip-text text-transparent
-                                         bg-gradient-to-br from-yellow-500 to-orange-500
-                                         dark:from-yellow-300 dark:to-yellow-500"
-                            >
-                              VS
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Probability Bar */}
-                      <div
-                        className="h-3 sm:h-4 bg-gray-200 dark:bg-gray-700
-                                   rounded-full overflow-hidden relative shadow-inner"
-                      >
-                        {(() => {
-                          const team1 = orderedTeamNames[0];
-                          const team2 = orderedTeamNames[1];
-                          let prob1 = parseFloat(
-                            oddsData[team1][0]?.probability?.replace("%", "") ||
-                              "0"
-                          );
-                          let prob2 = parseFloat(
-                            oddsData[team2][0]?.probability?.replace("%", "") ||
-                              "0"
-                          );
-                          if (isNaN(prob1)) prob1 = 0;
-                          if (isNaN(prob2)) prob2 = 0;
-                          if (prob1 === 0 && prob2 === 0) {
-                            prob1 = 50;
-                            prob2 = 50;
-                          }
-                          const totalProb = prob1 + prob2;
-                          if (totalProb > 0 && totalProb !== 100) {
-                            const factor = 100 / totalProb;
-                            prob1 = Math.round(prob1 * factor);
-                            prob2 = 100 - prob1;
-                          }
-                          const isTeam1Winner = team1 === bestTeam;
-                          const isTeam2Winner = team2 === bestTeam;
-
-                          return (
-                            <>
-                              {/* Left segment */}
-                              <div
-                                className={`absolute inset-y-0 left-0 rounded-l-full ${
-                                  isTeam1Winner
-                                    ? "bg-gradient-to-r from-green-400 to-green-500 dark:from-green-500 dark:to-green-400"
-                                    : "bg-gradient-to-r from-red-400 to-red-500 dark:from-red-500 dark:to-red-500"
-                                }`}
-                                style={{ width: `${prob1}%` }}
-                              >
-                                {prob1 > 15 && (
-                                  <div className="absolute inset-0 flex items-center justify-start pl-2">
-                                    <span className="text-[10px] sm:text-xs text-white font-semibold drop-shadow-md">
-                                      {prob1}%
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Right segment */}
-                              <div
-                                className={`absolute inset-y-0 right-0 rounded-r-full ${
-                                  isTeam2Winner
-                                    ? "bg-gradient-to-l from-green-400 to-green-500 dark:from-green-500 dark:to-green-400"
-                                    : "bg-gradient-to-l from-red-400 to-red-500 dark:from-red-400 dark:to-red-500"
-                                }`}
-                                style={{ width: `${prob2}%` }}
-                              >
-                                {prob2 > 15 && (
-                                  <div className="absolute inset-0 flex items-center justify-end pr-2">
-                                    <span className="text-[10px] sm:text-xs text-white font-semibold drop-shadow-md">
-                                      {prob2}%
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                            </>
-                          );
-                        })()}
-                      </div>
-
-                      {/* Favored vs Underdog */}
-                      <div className="flex justify-between mt-2">
-                        {orderedTeamNames.map((team) => {
-                          const isWinner = team === bestTeam;
-                          return (
-                            <div key={`status-${team}`} className="w-auto">
-                              <span
-                                className={`px-1.5 py-0.5 rounded-sm text-[9px] sm:text-xs font-medium ${
-                                  isWinner
-                                    ? "bg-green-100/80 text-green-700 dark:bg-green-900/40 dark:text-green-300"
-                                    : "bg-red-100/80 text-red-700 dark:bg-red-900/40 dark:text-red-300"
-                                }`}
-                              >
-                                {isWinner ? "Favored" : "Underdog"}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Odds Table Tabs for Desktop */}
-                <Tabs defaultValue={orderedTeamNames[0]}>
-                  <TabsList
-                    className="mx-auto mb-3 bg-card/80 border border-border/30 shadow-sm
-                               rounded-lg w-fit flex gap-1"
-                  >
-                    {orderedTeamNames.map((team) => (
-                      <TabsTrigger
-                        key={team}
-                        value={team}
-                        className="relative min-w-[100px] px-3 py-1.5
-                                   text-sm font-medium transition-all duration-200
-                                   data-[state=active]:bg-transparent 
-                                   data-[state=active]:text-foreground
-                                   data-[state=inactive]:text-muted-foreground
-                                   data-[state=inactive]:hover:text-foreground/80"
-                      >
-                        <div className="flex items-center gap-1.5">
-                          <div className="relative w-4 h-4 flex items-center justify-center rounded overflow-hidden">
+              <div className="mx-auto w-full max-w-8xl px-4">
+                <div
+                  className="rounded-2xl shadow-lg border border-gray-200 dark:border-zinc-800
+                            p-6 sm:p-8 md:p-12 min-h-[550px] flex flex-col justify-between"
+                  style={{
+                    backgroundColor: "hsl(var(--card))",
+                    color: "hsl(var(--card-foreground))",
+                  }}
+                >
+                  <div className="flex flex-col items-center gap-6 mb-8">
+                    {/* Header: Teams */}
+                    <h1 className="font-bold text-center">
+                      <div className="flex flex-col items-center gap-6 mb-1">
+                        <h1 className="font-bold text-center">
+                          <div className="flex items-center justify-center gap-2 sm:gap-4 flex-nowrap">
                             <img
-                              src={logos?.[team] ?? getTeamLogo(team)}
-                              alt={`${team} logo`}
-                              className="w-3.5 h-3.5 object-contain"
+                              src={logoLeft}
+                              alt={`${awayTeam} logo`}
+                              className="w-8 h-8 max-[319px]:w-6 max-[319px]:h-6 sm:w-10 sm:h-10 md:w-12 md:h-12"
+                            />
+                            <span className="block max-[319px]:block hidden max-[319px]:whitespace-normal
+                                            max-[319px]:max-w-[120px] max-[319px]:text-[0.65rem]
+                                            overflow-hidden truncate"
+                            >
+                              {getShortTeamName(awayTeam)} vs. {getShortTeamName(homeTeam)}
+                            </span>
+                            <span className="whitespace-nowrap text-[0.75rem] max-[319px]:hidden
+                                            text-xl sm:text-2xl md:text-3xl lg:text-4xl
+                                            overflow-hidden truncate"
+                            >
+                              {awayTeam} vs. {homeTeam}
+                            </span>
+                            <img
+                              src={logoRight}
+                              alt={`${homeTeam} logo`}
+                              className="w-8 h-8 max-[319px]:w-6 max-[319px]:h-6 sm:w-10 sm:h-10 md:w-12 md:h-12"
                             />
                           </div>
-                          <span className="max-[419px]:hidden">{team}</span>
-                          <span className="hidden max-[419px]:block">
-                            {getShortTeamName(team)}
-                          </span>
-                        </div>
-                        <div
-                          className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-primary
-                                     scale-x-0 transition-transform duration-200
-                                     data-[state=active]:scale-x-100"
-                        />
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
+                        </h1>
+                      </div>
+                    </h1>
 
-                  {orderedTeamNames.map((team) => (
-                    <TabsContent
-                      key={team}
-                      value={team}
-                      className="outline-none focus-visible:ring-0 focus-visible:ring-transparent"
+                    {/* Info Chips: Date, Time, Location */}
+                    <div className="flex flex-wrap items-center justify-center gap-3 text-xs sm:text-sm">
+                      <div className="flex items-center gap-2 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-full">
+                        <CalendarIcon className="h-4 w-4 text-indigo-500" />
+                        <span className="font-medium">{formattedDate}</span>
+                      </div>
+                      <div className="flex items-center gap-2 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-full">
+                        <ClockIcon className="h-4 w-4 text-red-500" />
+                        <span className="font-medium">{formattedTime}</span>
+                      </div>
+                      <div className="flex items-center gap-2 border border-gray-200 dark:border-gray-700 px-3 py-1.5 rounded-full">
+                        <MapPinIcon className="h-4 w-4 text-blue-500" />
+                        <span className="font-medium">
+                          {gameDetails.arena || "TBD"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Scrollable info row */}
+                    <div className="py-1 w-full">
+                      <div className="border-t border-b border-gray-100 dark:border-gray-800/50 relative">
+                        {showLeftGradient && (
+                          <div className="absolute left-0 top-0 bottom-0 w-6
+                                          bg-gradient-to-r from-white dark:from-zinc-900 to-transparent
+                                          pointer-events-none z-10"
+                          />
+                        )}
+                        <div
+                          ref={scrollContainerRef}
+                          className="py-3 flex items-center justify-center gap-x-6 sm:gap-x-8
+                                    overflow-x-auto whitespace-nowrap px-4 text-xs sm:text-sm scroll-pl-4"
+                          onScroll={handleScroll}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-purple-500 dark:text-purple-400">
+                              H2H:
+                            </span>
+                            <span className="text-xs">{gameDetails.h2h_record}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <TrendingUpIcon className="h-4 w-4 text-green-500 dark:text-green-400" />
+                            <span className="text-xs">{gameDetails.over_under}</span>
+                          </div>
+                          {gameDetails.player_injury && (
+                            <div className="flex items-center gap-2">
+                              <AlertTriangleIcon className="h-4 w-4 text-red-500 dark:text-red-400" />
+                              <span className="text-xs">
+                                {gameDetails.player_injury}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Desktop "Prediction" Section */}
+                    <div
+                      className="flex flex-col items-center gap-2.5 border border-yellow-200
+                                dark:border-yellow-900/50 p-3 sm:p-4 rounded-xl w-full mx-auto
+                                bg-gradient-to-b from-yellow-50/40 to-transparent dark:from-yellow-900/20
+                                shadow-sm"
                     >
-                      <OddsTable oddsData={oddsData[team]} />
-                    </TabsContent>
-                  ))}
-                </Tabs>
+                      {/* Trophy + Title */}
+                      <div className="flex items-center justify-center gap-1.5 w-full">
+                        <div className="flex-shrink-0 bg-yellow-100 dark:bg-yellow-900/30 p-1 sm:p-1.5 rounded-full">
+                          <FaTrophy className="text-yellow-500 dark:text-yellow-400 h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        </div>
+                        <h3 className="font-bold text-sm sm:text-base text-center">
+                          <span className="hidden sm:inline">{bestTeam}</span>
+                          <span className="inline sm:hidden">
+                            {getShortTeamName(bestTeam)}
+                          </span>
+                          <span className="text-yellow-600 dark:text-yellow-400"> predicted to win!</span>
+                          <TooltipProvider>
+                            <InfoTooltip
+                              text={
+                                <div>
+                                  <p>This prediction is based on our Iverson 1.1 model.</p>
+                                  <div className="h-2"></div>
+                                  <p>
+                                    Our model analyzes team performance over a season along with
+                                    historical matchups to bring you the best results.
+                                  </p>
+                                </div>
+                              }
+                              className="text-muted-foreground ml-2 -mt-0.5"
+                            />
+                          </TooltipProvider>
+                        </h3>
+                      </div>
+
+                      {/* Probability bars & Favored/Underdog labels */}
+                      <div className="w-full bg-white/50 dark:bg-black/10 rounded-lg p-2.5 sm:p-3 relative">
+                        {/* Teams row */}
+                        <div className="flex justify-between items-center mb-3 relative">
+                          {orderedTeamNames.map((team, index) => {
+                            const probability = parseFloat(
+                              oddsData[team][0]?.probability?.replace("%", "") || "0"
+                            );
+                            const isWinner = team === bestTeam;
+                            const isRightTeam = index === 1;
+                            return (
+                              <div
+                                key={team}
+                                className={`flex items-center gap-2 ${
+                                  isRightTeam ? "flex-row-reverse" : ""
+                                }`}
+                              >
+                                <div
+                                  className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full p-1 flex items-center justify-center
+                                              shadow-sm ${
+                                                isWinner
+                                                  ? "bg-green-100 dark:bg-green-900/30 ring-1 ring-green-200 dark:ring-green-900/50"
+                                                  : "bg-red-100 dark:bg-red-900/30 ring-1 ring-red-200 dark:ring-red-900/50"
+                                              }`}
+                                >
+                                  <img
+                                    src={logos?.[team] ?? getTeamLogo(team)}
+                                    alt={`${team} logo`}
+                                    className="w-full h-full object-contain"
+                                  />
+                                </div>
+                                <div>
+                                  <div className="font-medium text-xs sm:text-sm">
+                                    <span className="hidden sm:inline">{team}</span>
+                                    <span className="inline sm:hidden">
+                                      {getShortTeamName(team)}
+                                    </span>
+                                  </div>
+                                  <div
+                                    className={`text-xs sm:text-sm font-semibold ${
+                                      isRightTeam ? "text-right" : "text-left"
+                                    } ${
+                                      isWinner
+                                        ? "text-green-600 dark:text-green-400"
+                                        : "text-red-600 dark:text-red-400"
+                                    }`}
+                                  >
+                                    {oddsData[team][0]?.probability || "N/A"}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+
+                          {/* VS marker */}
+                          <div
+                            className="absolute left-1/2 top-1/2 transform
+                                      -translate-x-1/2 -translate-y-1/2"
+                          >
+                            <div
+                              className="bg-gradient-to-b from-white to-gray-50 dark:from-gray-700
+                                        dark:to-gray-800 rounded-full h-5 w-5 sm:h-6 sm:w-6
+                                        flex items-center justify-center shadow-md
+                                        border-2 border-yellow-100 dark:border-yellow-900/50"
+                            >
+                              <span
+                                className="text-[9px] sm:text-[10px] font-extrabold
+                                          bg-clip-text text-transparent
+                                          bg-gradient-to-br from-yellow-500 to-orange-500
+                                          dark:from-yellow-300 dark:to-yellow-500"
+                              >
+                                VS
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Probability Bar */}
+                        <div
+                          className="h-3 sm:h-4 bg-gray-200 dark:bg-gray-700
+                                    rounded-full overflow-hidden relative shadow-inner"
+                        >
+                          {(() => {
+                            const team1 = orderedTeamNames[0];
+                            const team2 = orderedTeamNames[1];
+                            let prob1 = parseFloat(
+                              oddsData[team1][0]?.probability?.replace("%", "") ||
+                                "0"
+                            );
+                            let prob2 = parseFloat(
+                              oddsData[team2][0]?.probability?.replace("%", "") ||
+                                "0"
+                            );
+                            if (isNaN(prob1)) prob1 = 0;
+                            if (isNaN(prob2)) prob2 = 0;
+                            if (prob1 === 0 && prob2 === 0) {
+                              prob1 = 50;
+                              prob2 = 50;
+                            }
+                            const totalProb = prob1 + prob2;
+                            if (totalProb > 0 && totalProb !== 100) {
+                              const factor = 100 / totalProb;
+                              prob1 = Math.round(prob1 * factor);
+                              prob2 = 100 - prob1;
+                            }
+                            const isTeam1Winner = team1 === bestTeam;
+                            const isTeam2Winner = team2 === bestTeam;
+
+                            return (
+                              <>
+                                {/* Left segment */}
+                                <div
+                                  className={`absolute inset-y-0 left-0 rounded-l-full ${
+                                    isTeam1Winner
+                                      ? "bg-gradient-to-r from-green-400 to-green-500 dark:from-green-500 dark:to-green-400"
+                                      : "bg-gradient-to-r from-red-400 to-red-500 dark:from-red-500 dark:to-red-500"
+                                  }`}
+                                  style={{ width: `${prob1}%` }}
+                                >
+                                  {prob1 > 15 && (
+                                    <div className="absolute inset-0 flex items-center justify-start pl-2">
+                                      <span className="text-[10px] sm:text-xs text-white font-semibold drop-shadow-md">
+                                        {prob1}%
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Right segment */}
+                                <div
+                                  className={`absolute inset-y-0 right-0 rounded-r-full ${
+                                    isTeam2Winner
+                                      ? "bg-gradient-to-l from-green-400 to-green-500 dark:from-green-500 dark:to-green-400"
+                                      : "bg-gradient-to-l from-red-400 to-red-500 dark:from-red-400 dark:to-red-500"
+                                  }`}
+                                  style={{ width: `${prob2}%` }}
+                                >
+                                  {prob2 > 15 && (
+                                    <div className="absolute inset-0 flex items-center justify-end pr-2">
+                                      <span className="text-[10px] sm:text-xs text-white font-semibold drop-shadow-md">
+                                        {prob2}%
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              </>
+                            );
+                          })()}
+                        </div>
+
+                        {/* Favored vs Underdog */}
+                        <div className="flex justify-between mt-2">
+                          {orderedTeamNames.map((team) => {
+                            const isWinner = team === bestTeam;
+                            return (
+                              <div key={`status-${team}`} className="w-auto">
+                                <span
+                                  className={`px-1.5 py-0.5 rounded-sm text-[9px] sm:text-xs font-medium ${
+                                    isWinner
+                                      ? "bg-green-100/80 text-green-700 dark:bg-green-900/40 dark:text-green-300"
+                                      : "bg-red-100/80 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+                                  }`}
+                                >
+                                  {isWinner ? "Favored" : "Underdog"}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Odds Table Tabs for Desktop */}
+                  <Tabs defaultValue={orderedTeamNames[0]}>
+                    <TabsList
+                      className="mx-auto mb-3 bg-card/80 border border-border/30 shadow-sm
+                                rounded-lg w-fit flex gap-1"
+                    >
+                      {orderedTeamNames.map((team) => (
+                        <TabsTrigger
+                          key={team}
+                          value={team}
+                          className="relative min-w-[100px] px-3 py-1.5
+                                    text-sm font-medium transition-all duration-200
+                                    data-[state=active]:bg-transparent 
+                                    data-[state=active]:text-foreground
+                                    data-[state=inactive]:text-muted-foreground
+                                    data-[state=inactive]:hover:text-foreground/80"
+                        >
+                          <div className="flex items-center gap-1.5">
+                            <div className="relative w-4 h-4 flex items-center justify-center rounded overflow-hidden">
+                              <img
+                                src={logos?.[team] ?? getTeamLogo(team)}
+                                alt={`${team} logo`}
+                                className="w-3.5 h-3.5 object-contain"
+                              />
+                            </div>
+                            <span className="max-[419px]:hidden">{team}</span>
+                            <span className="hidden max-[419px]:block">
+                              {getShortTeamName(team)}
+                            </span>
+                          </div>
+                          <div
+                            className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-primary
+                                      scale-x-0 transition-transform duration-200
+                                      data-[state=active]:scale-x-100"
+                          />
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+
+                    {orderedTeamNames.map((team) => (
+                      <TabsContent
+                        key={team}
+                        value={team}
+                        className="outline-none focus-visible:ring-0 focus-visible:ring-transparent"
+                      >
+                        <OddsTable oddsData={oddsData[team]} />
+                      </TabsContent>
+                    ))}
+                  </Tabs>
+                </div>
               </div>
               {/* Prev/Next Buttons placed inside the main content */}
               <div className="flex justify-between my-6">
@@ -1034,6 +1041,31 @@ function GameDetails({
           </div>
         )}
       </main>
+
+      {(isTablet || isMobile) && (
+        <div className="mt-8 px-6 pb-12">
+          <div
+            className="bg-card text-foreground p-4 border border-border rounded-lg shadow-md 
+                      hover:shadow-lg transition-all duration-300 relative overflow-hidden"
+          >
+            <div className="relative">
+              <Articles 
+                articles={articleData} 
+                useHeader={false} 
+                disableStyle={true}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+
+
+
+
+
+
+
     </div>
   );
 }

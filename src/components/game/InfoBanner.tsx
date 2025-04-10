@@ -7,13 +7,9 @@ type InfoBannerProps = {
   headerHeight?: number;
 };
 
-const InfoBanner: React.FC<InfoBannerProps> = ({
-  headerHeight = 80,
-}) => {
+const InfoBanner: React.FC<InfoBannerProps> = ({ headerHeight = 80 }) => {
   return (
-    <div
-      className="bg-card p-4 border rounded-lg shadow-sm overflow-auto"
-    >
+    <div className="bg-card p-4 border border-border rounded-lg shadow-md">
       <h2 className="text-2xl font-extrabold mb-5 text-primary">
         Helpful Articles & Info
       </h2>
@@ -21,33 +17,34 @@ const InfoBanner: React.FC<InfoBannerProps> = ({
         {articleData.map((article) => (
           <li
             key={article.url}
-            className="p-4 rounded-lg shadow-md border border-border/50 
-                   bg-gradient-to-r from-background via-card/90 to-background 
-                   dark:from-zinc-900 dark:via-zinc-800/90 dark:to-zinc-900
-                   dark:border-zinc-700/60 dark:shadow-zinc-900/30
-                   hover:shadow-lg hover:border-border/70 hover:bg-gradient-to-r 
-                   hover:from-background hover:via-card hover:to-background
-                   dark:hover:from-zinc-900 dark:hover:via-zinc-800 dark:hover:to-zinc-900
-                   dark:hover:border-zinc-600 dark:hover:shadow-zinc-800/40
-                   transition-all duration-300"
+            className="p-4 rounded-xl border border-border/60 bg-gradient-to-br 
+                       from-background via-card to-background shadow-sm 
+                       dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-900
+                       dark:border-zinc-700/60 hover:shadow-lg transition-all duration-300"
           >
             <Link
               href={`/articles/${article.url}`}
-              className="block text-xl font-semibold text-gray-800 dark:text-gray-100 hover:text-primary transition-colors"
+              className="group block"
             >
-              {article.title}
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-              {article.description || "Learn more by clicking this article."}
-            </p>
+              <span className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
+                {article.title}
+              </span>
+              <p className="text-sm mt-2 text-muted-foreground">
+                {article.description || "Learn more by clicking this article."}
+              </p>
+              <span className="mt-2 inline-block text-primary text-sm font-medium group-hover:underline transition-all">
+                Read more →
+              </span>
             </Link>
           </li>
         ))}
       </ul>
+
       <div className="mt-8">
-        <h3 className="text-lg font-bold mb-3 text-gray-800 dark:text-gray-100">
+        <h3 className="text-lg font-bold mb-3 text-foreground">
           Quick Tips
         </h3>
-        <ul className="list-disc list-inside text-sm text-gray-600 dark:text-gray-400 space-y-1">
+        <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
           <li>Understand your odds before placing bets.</li>
           <li>Check injury reports for key players.</li>
           <li>Explore our guides for advanced strategies.</li>

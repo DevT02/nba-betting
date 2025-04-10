@@ -62,8 +62,15 @@ MONGODB_URI=your-mongodb-connection-uri
 MONGODB_DB=your-database-name
 ```
 
-#### 3. Start the dev server again:
+#### 2. Start the dev server again:
 
 ```bash
 npm run dev
+```
+
+#### Or.. if you know what you're doing
+Start the production server enviornment
+```bash
+npm run build
+npm run start
 ```

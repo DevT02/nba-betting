@@ -39,11 +39,21 @@ export default async function Home({
   let games: any[] = [];
 
   if (activeTab === "Featured") {
-    // Filter today's games.
-    // Sort by commence time
-    // Group games by key (using team names + time). For each group, store:
-    //    - navGame: the first (chronologically earliest) game (for navigation)
-    //    - displayGame: the game with the highest Kelly value (for display)
+
+    /**
+     * The logic is a bit multifacted, if you're confused i have added comments to make this easier to explain
+        Before we fetched using an approach that may find the middle key in the database for kelly fraction
+            Hopefully this makes sense! as we want to show the best kelly fraction for each game,
+            We end up finding a bookmaker that is not the first one for that game.
+            So we need to group the games by team and time, and then find the best kelly fraction for each group.
+        BUT we want the first id of the bookmaker for that game! that way we can still navigate properly!
+        thats essentially what this does.
+     */
+
+    // Filter todays games and sort by commence time
+    // Group games by using team names + time. For each group, store:
+    // navGame: the first (chronologically earliest) game (for navigation)
+    // displayGame: the game with the highest Kelly value (for display)
     // Convert the groups into an array. Sort groups by the highest Kelly (displayGame's best Kelly) to pick the top 4.
     // Sort groups by the highest Kelly (displayGame's best Kelly) to pick the top 4.
 

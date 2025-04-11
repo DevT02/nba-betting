@@ -40,27 +40,27 @@ export default async function Home({
 
   // Filter games based on the selected tab
   if (activeTab === "Featured") {
-    // For featured, group today’s games and choose the ones with the best win probability
-    const groupedGames = new Map<string, any>();
+    // For featured, group today’s games and choose the ones with the best Kelly criterion (bankroll percentage)
+    const groupedGames = new Map();
     for (const game of evResults) {
       const gameTime = new Date(game.commence_time);
       if (gameTime >= new Date(startTodayStr) && gameTime <= new Date(endTodayStr)) {
         const key = `${game.home_team}-${game.away_team}-${game.commence_time}`;
         const existing = groupedGames.get(key);
-        const maxProb = Math.max(game.home_win_prob, game.away_win_prob);
-  
-        if (!existing || maxProb > Math.max(existing.home_win_prob, existing.away_win_prob)) {
+        const maxKelly = Math.max(game.home_kelly, game.away_kelly);
+        if (!existing || maxKelly > Math.max(existing.home_kelly, existing.away_kelly)) {
           groupedGames.set(key, game);
         }
       }
     }
+    // Convert grouped values to an array, sort descending by highest Kelly percentage, and limit to the top 4.
     games = Array.from(groupedGames.values())
       .sort((a, b) => {
-        const maxA = Math.max(a.home_win_prob, a.away_win_prob);
-        const maxB = Math.max(b.home_win_prob, b.away_win_prob);
+        const maxA = Math.max(a.home_kelly, a.away_kelly);
+        const maxB = Math.max(b.home_kelly, b.away_kelly);
         return maxB - maxA;
       })
-      .slice(0, 4);
+    .slice(0, 4);
   } else if (activeTab === "Today") {
     games = evResults.filter((game) => {
       const gameTime = new Date(game.commence_time);
@@ -90,7 +90,7 @@ export default async function Home({
   switch (activeTab) {
     case "Featured":
       headingText = "Featured Games";
-      subHeading = "Curated top match-ups based on high-value odds.";
+      subHeading = "Today's top 4 betting picks, ranked by smart value (Kelly %)."
       break;
     case "Today":
       headingText = "Games Today";

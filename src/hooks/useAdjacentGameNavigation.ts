@@ -1,15 +1,21 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export function useAdjacentGameNavigation(gameIds: string[] | undefined, currentGameId: string | undefined) {
+export function useAdjacentGameNavigation(
+  gameIds: string[] | undefined,
+  currentGameId: string | undefined
+) {
   const router = useRouter();
 
   const getAdjacentGameId = (direction: "prev" | "next"): string | null => {
     if (!gameIds || !currentGameId) return null;
     const index = gameIds.indexOf(currentGameId);
     if (index === -1) return null;
-    const newIndex = direction === "prev" ? index - 1 : index + 1;
-    return gameIds[newIndex] || null;
+    const newIndex =
+      direction === "prev"
+        ? (index - 1 + gameIds.length) % gameIds.length
+        : (index + 1) % gameIds.length;
+    return gameIds[newIndex];
   };
 
   useEffect(() => {

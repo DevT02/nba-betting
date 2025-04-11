@@ -1,7 +1,6 @@
-// src/app/page.tsx
 import Header from "@/components/game/Header";
 import Link from "next/link";
-import InfoBanner from "@/components/game/InfoBanner"; // Newly imported for the sidebar
+import InfoBanner from "@/components/game/InfoBanner"; 
 
 import { formatInTimeZone } from "date-fns-tz";
 import { addDays } from "date-fns";
@@ -13,6 +12,7 @@ import { deduplicateGames } from "@/lib/utils";
 
 import GamesGridWrapper from "@/components/game/GamesGridWrapper";
 import TimeZoneSync from '@/components/utils/TimeZoneSync';
+import { InfoTooltip, TooltipProvider } from "@/components/utils/ToolTipComponent";
 
 export default async function Home({
   searchParams,
@@ -37,6 +37,7 @@ export default async function Home({
   const upcomingGames = await getUpcomingGames();
   const evResults = await getEvResults();
   let games: any[] = [];
+
 
   // Filter games based on the selected tab
   if (activeTab === "Featured") {
@@ -138,10 +139,35 @@ export default async function Home({
         </div>
 
         {/* heading as to what it is */}
-        <div className="mt-4 text-left">
+        <div className="mt-4 text-left flex items-center gap-1.5">
           <h2 className="text-2xl font-bold">{headingText}</h2>
-          <p className="text-sm text-muted-foreground">{subHeading}</p>
         </div>
+        <div className="text-sm text-muted-foreground flex items-center gap-1.5">
+          <p>{subHeading}</p>
+          {activeTab === "Featured" && (
+            <div className="flex items-center gap-1.5">
+              <TooltipProvider>
+                <InfoTooltip
+                  text={
+                    <div className="space-y-2">
+                      <p>
+                        Kelly percentage shows the recommended amount to bet based on expected value.
+                      </p>
+                      <p>
+                        Higher values mean stronger bets; low or zero means avoid.
+                      </p>
+                      <p>
+                        It's a long-term strategy used by smart bettors.
+                      </p>
+                    </div>
+                  }
+                  isMobile={false}
+                />
+              </TooltipProvider>
+            </div>
+          )}
+        </div>
+
         {/* grid layout - lg up screens dont have enough content */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="col-span-12 lg:col-span-8">

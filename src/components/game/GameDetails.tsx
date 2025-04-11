@@ -576,10 +576,10 @@ function GameDetails({
                       key={team}
                       value={team}
                       className="relative min-w-[100px] px-3 py-1.5 text-sm font-medium
-                                 transition-all duration-200 data-[state=active]:bg-transparent 
-                                 data-[state=active]:text-foreground
+                                 transition-all duration-200
+                                 data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:font-semibold
                                  data-[state=inactive]:text-muted-foreground
-                                 data-[state=inactive]:hover:text-foreground/80"
+                                 data-[state=inactive]:hover:text-foreground/80 data-[state=inactive]:hover:bg-accent/50"
                     >
                       <div className="flex items-center gap-1.5">
                         <div className="relative w-4 h-4 flex items-center justify-center rounded overflow-hidden">
@@ -980,10 +980,9 @@ function GameDetails({
                           value={team}
                           className="relative min-w-[100px] px-3 py-1.5
                                     text-sm font-medium transition-all duration-200
-                                    data-[state=active]:bg-transparent 
-                                    data-[state=active]:text-foreground
+                                    data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:font-semibold
                                     data-[state=inactive]:text-muted-foreground
-                                    data-[state=inactive]:hover:text-foreground/80"
+                                    data-[state=inactive]:hover:text-foreground/80 data-[state=inactive]:hover:bg-accent/50"
                         >
                           <div className="flex items-center gap-1.5">
                             <div className="relative w-4 h-4 flex items-center justify-center rounded overflow-hidden">

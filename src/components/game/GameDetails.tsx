@@ -78,6 +78,17 @@ function GameDetails({
     }, teamNames[0]);
   }, [teamNames, oddsData]);
 
+  // Which team has highest Kelly
+  const bestKellyTeam = React.useMemo(() => {
+    return teamNames.reduce((prev, curr) => {
+      const currKelly = parseFloat(oddsData[curr][0]?.kelly) || 0;
+      const prevKelly = parseFloat(oddsData[prev][0]?.kelly) || 0;
+      return currKelly > prevKelly ? curr : prev;
+    }, teamNames[0]);
+  }, [teamNames, oddsData]);
+  
+
+
   // Logos for away/home
   const logoLeft = logos?.[awayTeam] ?? getTeamLogo(awayTeam);
   const logoRight = logos?.[homeTeam] ?? getTeamLogo(homeTeam);
@@ -566,7 +577,7 @@ function GameDetails({
               </div>
 
               {/* Tabs for mobile: OddsTable */}
-              <Tabs defaultValue={orderedTeamNames[0]}>
+              <Tabs defaultValue={bestKellyTeam || orderedTeamNames[0]}>
                 <TabsList
                   className="mx-auto mb-3 bg-card/80 border border-border/30 shadow-sm rounded-lg
                              w-fit flex gap-1"
@@ -969,7 +980,7 @@ function GameDetails({
                   </div>
 
                   {/* Odds Table Tabs for Desktop */}
-                  <Tabs defaultValue={orderedTeamNames[0]}>
+                  <Tabs defaultValue={bestKellyTeam || orderedTeamNames[0]}>
                     <TabsList
                       className="mx-auto mb-3 bg-card/80 border border-border/30 shadow-sm
                                 rounded-lg w-fit flex gap-1"

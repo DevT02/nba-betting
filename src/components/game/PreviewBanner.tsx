@@ -1,4 +1,3 @@
-// src/components/game/PreviewBanner.tsx
 "use client";
 import React, { useState } from "react";
 import { format } from "date-fns";
@@ -23,20 +22,26 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
   const [upcomingExpanded, setUpcomingExpanded] = useState(false);
   const PREVIEW_LIMIT = 3;
 
+  // Create sorted arrays based on commence_time (ascending order)
+  const sortedTodayPreviews = [...todayPreviews].sort(
+    (a, b) => new Date(a.commence_time).getTime() - new Date(b.commence_time).getTime()
+  );
+  const sortedUpcomingPreviews = [...upcomingPreviews].sort(
+    (a, b) => new Date(a.commence_time).getTime() - new Date(b.commence_time).getTime()
+  );
+
   // Limit displayed previews if not expanded.
   const todayToShow =
-    !todayExpanded && todayPreviews.length > PREVIEW_LIMIT
-      ? todayPreviews.slice(0, PREVIEW_LIMIT)
-      : todayPreviews;
+    !todayExpanded && sortedTodayPreviews.length > PREVIEW_LIMIT
+      ? sortedTodayPreviews.slice(0, PREVIEW_LIMIT)
+      : sortedTodayPreviews;
   const upcomingToShow =
-    !upcomingExpanded && upcomingPreviews.length > PREVIEW_LIMIT
-      ? upcomingPreviews.slice(0, PREVIEW_LIMIT)
-      : upcomingPreviews;
+    !upcomingExpanded && sortedUpcomingPreviews.length > PREVIEW_LIMIT
+      ? sortedUpcomingPreviews.slice(0, PREVIEW_LIMIT)
+      : sortedUpcomingPreviews;
 
   return (
-    <div
-      className="bg-card p-4 border rounded-lg shadow-sm overflow-auto"
-    >
+    <div className="bg-card p-4 border rounded-lg shadow-sm overflow-auto">
       {/* Today's Games Section */}
       <div className="mb-4">
         <h3 className="text-lg font-bold mb-2 text-gray-800 dark:text-gray-100">
@@ -44,7 +49,7 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
         </h3>
       </div>
       <div className="space-y-4">
-        {todayPreviews.length === 0 ? (
+        {sortedTodayPreviews.length === 0 ? (
           <p className="text-xs text-center">No games today.</p>
         ) : (
           todayToShow.map((preview) => {
@@ -56,7 +61,8 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
                 onClick={() => router.push(`/gamedetails/${preview._id}`)}
                 className="cursor-pointer p-3 bg-gradient-to-br shadow-sm hover:shadow-md rounded-md border border-border relative transition-all duration-200 hover:scale-[1.02] group"
               >
-                <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-primary to-secondary rounded-md pointer-events-none"
+                <div
+                  className="absolute inset-0 opacity-5 bg-gradient-to-br from-primary to-secondary rounded-md pointer-events-none"
                   style={{ clipPath: "polygon(0 0, 100% 0, 85% 100%, 0 100%)" }}
                 ></div>
                 <div className="flex items-center gap-2">
@@ -84,8 +90,8 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                   </span>
-                  <Clock className="h-3 w-3" />
-                  <span className="text-xs">
+                  <Clock className="h-3 w-3" /> {/* text-emerald-400 */}
+                  <span className="text-xs"> {/* text-emerald-400 */}
                     Today, {format(gameTime, dateFormat)}
                   </span>
                 </div>
@@ -93,7 +99,7 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
             );
           })
         )}
-        {todayPreviews.length > PREVIEW_LIMIT && (
+        {sortedTodayPreviews.length > PREVIEW_LIMIT && (
           <div className="text-center">
             <button
               onClick={() => setTodayExpanded(!todayExpanded)}
@@ -112,7 +118,7 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
         </h3>
       </div>
       <div className="space-y-4">
-        {upcomingPreviews.length === 0 ? (
+        {sortedUpcomingPreviews.length === 0 ? (
           <p className="text-xs text-center">No upcoming games.</p>
         ) : (
           upcomingToShow.map((preview) => {
@@ -124,7 +130,8 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
                 onClick={() => router.push(`/gamedetails/${preview._id}`)}
                 className="cursor-pointer p-3 bg-gradient-to-br shadow-sm hover:shadow-md rounded-md border border-border relative transition-all duration-200 hover:scale-[1.02] group"
               >
-                <div className="absolute inset-0 opacity-5 bg-gradient-to-br from-primary to-secondary rounded-md pointer-events-none"
+                <div
+                  className="absolute inset-0 opacity-5 bg-gradient-to-br from-primary to-secondary rounded-md pointer-events-none"
                   style={{ clipPath: "polygon(0 0, 100% 0, 85% 100%, 0 100%)" }}
                 ></div>
                 <div className="flex items-center gap-2">
@@ -149,15 +156,13 @@ const PreviewBanner: React.FC<PreviewBannerProps> = ({
                 </div>
                 <div className="flex items-center gap-1.5 mt-2">
                   <Calendar className="h-3 w-3" />
-                  <span className="text-xs">
-                    {format(gameTime, dateFormat)}
-                  </span>
+                  <span className="text-xs">{format(gameTime, dateFormat)}</span>
                 </div>
               </div>
             );
           })
         )}
-        {upcomingPreviews.length > PREVIEW_LIMIT && (
+        {sortedUpcomingPreviews.length > PREVIEW_LIMIT && (
           <div className="text-center">
             <button
               onClick={() => setUpcomingExpanded(!upcomingExpanded)}

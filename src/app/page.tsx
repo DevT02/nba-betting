@@ -142,7 +142,7 @@ export default async function Home({
         <div className="mt-4 text-left flex items-center gap-1.5">
           <h2 className="text-2xl font-bold">{headingText}</h2>
         </div>
-        <div className="text-sm text-muted-foreground flex items-center gap-1.5">
+        <div className="text-sm text-muted-foreground flex items-center gap-0.5">
           <p>{subHeading}</p>
           {activeTab === "Featured" && (
             <div className="flex items-center gap-1.5">

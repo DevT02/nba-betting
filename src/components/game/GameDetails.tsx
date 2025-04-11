@@ -98,7 +98,6 @@ function GameDetails({
           })
       : [];
 
-  console.log(todayPreviews);
   const endOfToday = new Date();
   endOfToday.setHours(23, 59, 59, 999);
   const upcomingPreviews =
@@ -121,6 +120,8 @@ function GameDetails({
       }
     }
   }, []);
+
+
 
   // Possibly used for old "peek"/"open" logic
   const { leftBannerMode, rightBannerMode } = usePreviewMode();

@@ -15,6 +15,7 @@ const GameSelector = ({ games, currentGameId }: GameSelectorProps) => {
   const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
   const currentRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     if (currentRef.current && scrollRef.current) {
       const container = scrollRef.current;
@@ -26,6 +27,11 @@ const GameSelector = ({ games, currentGameId }: GameSelectorProps) => {
 
   if (!games || games.length === 0) return null;
 
+  // Create a sorted copy of the games by commence time (earliest first)
+  const sortedGames = [...games].sort(
+    (a, b) => new Date(a.commence_time).getTime() - new Date(b.commence_time).getTime()
+  );
+
   return (
     <div className="mb-4 relative">
       <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
@@ -35,7 +41,7 @@ const GameSelector = ({ games, currentGameId }: GameSelectorProps) => {
         className="flex overflow-x-auto py-2 px-1 scrollbar-hide snap-x snap-mandatory"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {games.map((game) => {
+        {sortedGames.map((game) => {
           const isCurrentGame = game._id === currentGameId;
           const gameTime = new Date(game.commence_time);
           

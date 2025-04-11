@@ -38,26 +38,66 @@ export default async function Home({
   const evResults = await getEvResults();
   let games: any[] = [];
 
-  // Filter games based on the selected tab
   if (activeTab === "Featured") {
-    // For featured, group today’s games and choose the ones with the best Kelly criterion (bankroll percentage)
-    const groupedGames = new Map();
-    for (const game of evResults) {
+    // Filter today's games.
+    // Sort by commence time
+    // Group games by key (using team names + time). For each group, store:
+    //    - navGame: the first (chronologically earliest) game (for navigation)
+    //    - displayGame: the game with the highest Kelly value (for display)
+    // Convert the groups into an array. Sort groups by the highest Kelly (displayGame's best Kelly) to pick the top 4.
+    // Sort groups by the highest Kelly (displayGame's best Kelly) to pick the top 4.
+
+    const todayGames = evResults.filter((game) => {
       const gameTime = new Date(game.commence_time);
-      if (gameTime >= new Date(startTodayStr) && gameTime <= new Date(endTodayStr)) {
-        const key = `${game.home_team}-${game.away_team}-${game.commence_time}`;
-        const existing = groupedGames.get(key);
-        const maxKelly = Math.max(game.home_kelly, game.away_kelly);
-        if (!existing || maxKelly > Math.max(existing.home_kelly, existing.away_kelly)) {
-          groupedGames.set(key, game);
+      return gameTime >= new Date(startTodayStr) && gameTime <= new Date(endTodayStr);
+    });
+
+    todayGames.sort(
+      (a, b) => new Date(a.commence_time).getTime() - new Date(b.commence_time).getTime()
+    );
+
+    type Grouped = {
+      navGame: typeof todayGames[number];
+      displayGame: typeof todayGames[number];
+    };
+    const groupedGames = new Map<string, Grouped>();
+
+    for (const game of todayGames) {
+      const key = `${game.home_team}-${game.away_team}-${game.commence_time}`;
+      if (!groupedGames.has(key)) {
+        // First occurrence becomes the navGame and initial displayGame.
+        groupedGames.set(key, { navGame: game, displayGame: game });
+      } else {
+        const group = groupedGames.get(key)!;
+        // Determine the highest Kelly in this group.
+        const currentKelly = Math.max(group.displayGame.home_kelly, group.displayGame.away_kelly);
+        const newKelly = Math.max(game.home_kelly, game.away_kelly);
+        // If the new game has a higher Kelly, update displayGame,
+        // but do not change navGame (which is the earliest game).
+        if (newKelly > currentKelly) {
+          group.displayGame = game;
         }
       }
     }
-    // Then sort by time (earliest first) so they display chronologically.
-    games = Array.from(groupedGames.values())
-      .sort((a, b) => Math.max(b.home_kelly, b.away_kelly) - Math.max(a.home_kelly, a.away_kelly))
-      .slice(0, 4)
-      .sort((a, b) => new Date(a.commence_time).getTime() - new Date(b.commence_time).getTime());
+
+    const groupsArray = Array.from(groupedGames.values());
+
+    groupsArray.sort((a, b) => {
+      const kellyA = Math.max(a.displayGame.home_kelly, a.displayGame.away_kelly);
+      const kellyB = Math.max(b.displayGame.home_kelly, b.displayGame.away_kelly);
+      return kellyB - kellyA;
+    });
+
+    const topGroups = groupsArray.slice(0, 4);
+
+    // 6. For navigation purposes, sort the top groups chronologically using navGame.
+    topGroups.sort(
+      (a, b) =>
+        new Date(a.navGame.commence_time).getTime() - new Date(b.navGame.commence_time).getTime()
+    );
+
+    // 7. Set 'games' for display to the best Kelly game per group...
+    games = topGroups.map((group) => group.displayGame);
   } else if (activeTab === "Today") {
     games = evResults
       .filter((game) => {

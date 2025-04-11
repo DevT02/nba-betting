@@ -83,7 +83,7 @@ function GameDetails({
   const logoRight = logos?.[homeTeam] ?? getTeamLogo(homeTeam);
 
   // Prev/Next navigation
-  const { getAdjacentGameId } = useAdjacentGameNavigation(gameIds, currentGameId);
+  const { getAdjacentGameId } = useAdjacentGameNavigation(gameIds, currentGameId, gamePreviews ?? {});
   const prevId = getAdjacentGameId("prev");
   const nextId = getAdjacentGameId("next");
 
@@ -120,8 +120,6 @@ function GameDetails({
       }
     }
   }, []);
-
-
 
   // Possibly used for old "peek"/"open" logic
   const { leftBannerMode, rightBannerMode } = usePreviewMode();

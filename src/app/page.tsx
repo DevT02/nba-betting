@@ -38,7 +38,6 @@ export default async function Home({
   const evResults = await getEvResults();
   let games: any[] = [];
 
-
   // Filter games based on the selected tab
   if (activeTab === "Featured") {
     // For featured, group today’s games and choose the ones with the best Kelly criterion (bankroll percentage)
@@ -54,31 +53,32 @@ export default async function Home({
         }
       }
     }
-    // Convert grouped values to an array, sort descending by highest Kelly percentage, and limit to the top 4.
+    // Then sort by time (earliest first) so they display chronologically.
     games = Array.from(groupedGames.values())
-      .sort((a, b) => {
-        const maxA = Math.max(a.home_kelly, a.away_kelly);
-        const maxB = Math.max(b.home_kelly, b.away_kelly);
-        return maxB - maxA;
-      })
-    .slice(0, 4);
+      .sort((a, b) => Math.max(b.home_kelly, b.away_kelly) - Math.max(a.home_kelly, a.away_kelly))
+      .slice(0, 4)
+      .sort((a, b) => new Date(a.commence_time).getTime() - new Date(b.commence_time).getTime());
   } else if (activeTab === "Today") {
-    games = evResults.filter((game) => {
-      const gameTime = new Date(game.commence_time);
-      return gameTime >= new Date(startTodayStr) && gameTime <= new Date(endTodayStr);
-    });
+    games = evResults
+      .filter((game) => {
+        const gameTime = new Date(game.commence_time);
+        return gameTime >= new Date(startTodayStr) && gameTime <= new Date(endTodayStr);
+      })
+      .sort((a, b) => new Date(a.commence_time).getTime() - new Date(b.commence_time).getTime());
   } else if (activeTab === "Tomorrow") {
-    games = evResults.filter((game) => {
-      const gameTime = new Date(game.commence_time);
-      return gameTime >= new Date(startTomorrowStr) && gameTime <= new Date(endTomorrowStr);
-    });
+    games = evResults
+      .filter((game) => { const gameTime = new Date(game.commence_time);
+        return gameTime >= new Date(startTomorrowStr) && gameTime <= new Date(endTomorrowStr);
+      })
+      .sort((a, b) => new Date(a.commence_time).getTime() - new Date(b.commence_time).getTime());
   } else if (activeTab === "Upcoming") {
-    games = evResults.filter((game) => {
-      const gameTime = new Date(game.commence_time);
-      return gameTime >= now && gameTime <= sevenDaysLater;
-    });
+    games = evResults
+      .filter((game) => { const gameTime = new Date(game.commence_time);
+        return gameTime >= now && gameTime <= sevenDaysLater;
+      })
+      .sort((a, b) => new Date(a.commence_time).getTime() - new Date(b.commence_time).getTime());
   }
-
+  
   games = deduplicateGames(games);
   games = await Promise.all(
     games.map(async (game) => {

@@ -46,6 +46,7 @@ function GameDetails({
   const userTimeZone = useUserTimeZone();
   const getTeamLogo = (team: string) => `/logos/${team}.svg`;
 
+
   // Format date/time in the user's time zone
   const eventTime = new Date(gameDetails.game_time);
   const formattedTime = new Intl.DateTimeFormat(undefined, {
@@ -96,6 +97,8 @@ function GameDetails({
             return gameTime.toDateString() === new Date().toDateString();
           })
       : [];
+
+  console.log(todayPreviews);
   const endOfToday = new Date();
   endOfToday.setHours(23, 59, 59, 999);
   const upcomingPreviews =

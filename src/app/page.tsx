@@ -1,11 +1,11 @@
 import Header from "@/components/game/Header";
 import Link from "next/link";
-import InfoBanner from "@/components/game/InfoBanner"; 
+import InfoBanner from "@/components/game/InfoBanner";
 
 import { formatInTimeZone } from "date-fns-tz";
 import { addDays } from "date-fns";
 
-import { mergeArenaInfo } from "@/lib/mergeGameData"; 
+import { mergeArenaInfo } from "@/lib/mergeGameData";
 import { getEvResults, getUpcomingGames } from "@/lib/staticCache";
 import { getTeamLogo } from "@/lib/teamNameMap";
 import { deduplicateGames } from "@/lib/utils";
@@ -39,23 +39,12 @@ export default async function Home({
   let games: any[] = [];
 
   if (activeTab === "Featured") {
-
     /**
-     * The logic is a bit multifacted, if you're confused i have added comments to make this easier to explain
-        Before we fetched using an approach that may find the middle key in the database for kelly fraction
-            Hopefully this makes sense! as we want to show the best kelly fraction for each game,
-            We end up finding a bookmaker that is not the first one for that game.
-            So we need to group the games by team and time, and then find the best kelly fraction for each group.
-        BUT we want the first id of the bookmaker for that game! that way we can still navigate properly!
-        thats essentially what this does.
+     * The logic is a bit multifaceted:
+     * - First we group today's games by team names and time.
+     * - For each group, we use navGame as the first occurrence (for navigation) and displayGame as the one with the highest Kelly fraction (for display).
+     * - Finally, we pick the top 4 groups by the highest Kelly value.
      */
-
-    // Filter todays games and sort by commence time
-    // Group games by using team names + time. For each group, store:
-    // navGame: the first (chronologically earliest) game (for navigation)
-    // displayGame: the game with the highest Kelly value (for display)
-    // Convert the groups into an array. Sort groups by the highest Kelly (displayGame's best Kelly) to pick the top 4.
-    // Sort groups by the highest Kelly (displayGame's best Kelly) to pick the top 4.
 
     const todayGames = evResults.filter((game) => {
       const gameTime = new Date(game.commence_time);
@@ -75,15 +64,11 @@ export default async function Home({
     for (const game of todayGames) {
       const key = `${game.home_team}-${game.away_team}-${game.commence_time}`;
       if (!groupedGames.has(key)) {
-        // First occurrence becomes the navGame and initial displayGame.
         groupedGames.set(key, { navGame: game, displayGame: game });
       } else {
         const group = groupedGames.get(key)!;
-        // Determine the highest Kelly in this group.
         const currentKelly = Math.max(group.displayGame.home_kelly, group.displayGame.away_kelly);
         const newKelly = Math.max(game.home_kelly, game.away_kelly);
-        // If the new game has a higher Kelly, update displayGame,
-        // but do not change navGame (which is the earliest game).
         if (newKelly > currentKelly) {
           group.displayGame = game;
         }
@@ -100,13 +85,12 @@ export default async function Home({
 
     const topGroups = groupsArray.slice(0, 4);
 
-    // 6. For navigation purposes, sort the top groups chronologically using navGame.
+    // For navigation purposes, sort the top groups chronologically using navGame.
     topGroups.sort(
       (a, b) =>
         new Date(a.navGame.commence_time).getTime() - new Date(b.navGame.commence_time).getTime()
     );
 
-    // 7. Set 'games' for display to the best Kelly game per group...
     games = topGroups.map((group) => group.displayGame);
   } else if (activeTab === "Today") {
     games = evResults
@@ -117,18 +101,20 @@ export default async function Home({
       .sort((a, b) => new Date(a.commence_time).getTime() - new Date(b.commence_time).getTime());
   } else if (activeTab === "Tomorrow") {
     games = evResults
-      .filter((game) => { const gameTime = new Date(game.commence_time);
+      .filter((game) => {
+        const gameTime = new Date(game.commence_time);
         return gameTime >= new Date(startTomorrowStr) && gameTime <= new Date(endTomorrowStr);
       })
       .sort((a, b) => new Date(a.commence_time).getTime() - new Date(b.commence_time).getTime());
   } else if (activeTab === "Upcoming") {
     games = evResults
-      .filter((game) => { const gameTime = new Date(game.commence_time);
+      .filter((game) => {
+        const gameTime = new Date(game.commence_time);
         return gameTime >= now && gameTime <= sevenDaysLater;
       })
       .sort((a, b) => new Date(a.commence_time).getTime() - new Date(b.commence_time).getTime());
   }
-  
+
   games = deduplicateGames(games);
   games = await Promise.all(
     games.map(async (game) => {
@@ -136,12 +122,13 @@ export default async function Home({
     })
   );
   games = JSON.parse(JSON.stringify(games)); // for JSON serialization
+
   let headingText = "";
   let subHeading = "";
   switch (activeTab) {
     case "Featured":
       headingText = "Featured Games";
-      subHeading = "Today's top 4 betting picks, ranked by smart value (Kelly %)."
+      subHeading = "Today's top 4 betting picks, ranked by smart value (Kelly %).";
       break;
     case "Today":
       headingText = "Games Today";
@@ -168,7 +155,7 @@ export default async function Home({
       <TimeZoneSync />
       <Header />
       <div className="flex-1 w-full px-4 sm:px-6 lg:px-8 flex flex-col gap-4 xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto">
-        {/* tab nav left-aligned */}
+        {/* Tab navigation */}
         <div className="pt-5 flex flex-col gap-2">
           <div className="flex items-center gap-6">
             {["Featured", "Today", "Tomorrow", "Upcoming"].map((tabName) => (
@@ -188,37 +175,52 @@ export default async function Home({
           <div className="w-full h-px bg-border dark:bg-zinc-800"></div>
         </div>
 
-        {/* heading as to what it is */}
+        {/* Heading and subheading */}
         <div className="mt-4 text-left flex items-center gap-1.5">
           <h2 className="text-2xl font-bold">{headingText}</h2>
         </div>
-        <div className="text-sm text-muted-foreground flex items-center gap-0.5">
+        <div className="text-xs md:text-sm text-muted-foreground flex flex-col md:flex-row md:items-center md:gap-0.5">
           <p>{subHeading}</p>
           {activeTab === "Featured" && (
             <div className="flex items-center gap-1.5">
-              <TooltipProvider>
-                <InfoTooltip
-                  text={
-                    <div className="space-y-2">
-                      <p>
-                        Kelly percentage shows the recommended amount to bet based on expected value.
-                      </p>
-                      <p>
-                        Higher values mean stronger bets; low or zero means avoid.
-                      </p>
-                      <p>
-                        It's a long-term strategy used by smart bettors.
-                      </p>
-                    </div>
-                  }
-                  isMobile={false}
-                />
-              </TooltipProvider>
+              <div className="hidden md:block">
+                <TooltipProvider>
+                  <InfoTooltip
+                    text={
+                      <div className="space-y-2">
+                        <p>
+                          Kelly percentage shows the recommended amount to bet based on expected value.
+                        </p>
+                        <p>
+                          Higher values mean stronger bets; low or zero means avoid.
+                        </p>
+                        <p>
+                          It's a long-term strategy used by smart bettors.
+                        </p>
+                      </div>
+                    }
+                    isMobile={false}
+                  />
+                </TooltipProvider>
+              </div>
+              <div className="block md:hidden mt-2 p-3 border border-border rounded-md bg-card/50 text-xs text-muted-foreground">
+                <div className="flex items-start gap-2">
+                  <p>
+                    Kelly percentage shows the recommended amount to bet based on expected value.
+                  </p>
+                  <p>
+                    Higher values mean stronger bets; low or zero means avoid.
+                  </p>
+                  <p>
+                    This long-term strategy is used by smart bettors.
+                  </p>
+                </div>
+              </div>
             </div>
           )}
         </div>
 
-        {/* grid layout - lg up screens dont have enough content */}
+        {/* Grid layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="col-span-12 lg:col-span-8">
             <GamesGridWrapper games={games} activeTab={activeTab} />

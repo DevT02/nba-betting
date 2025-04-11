@@ -6,7 +6,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Link from "next/link";
 import { ArticlePageParams } from "@/types/pageParams";
-
+import Image from "next/image";
 export const dynamic = "force-dynamic";
 
 export default async function ArticlePage({ params }: ArticlePageParams) {
@@ -436,11 +436,17 @@ By mastering point spread concepts and implementing advanced tactics, you transf
         <p className="text-xl text-gray-600 dark:text-gray-400 mb-6">
           {article.description}
         </p>
-        <img
-          src={article.image}
-          alt={article.title}
-          className="w-full rounded-lg shadow-lg mb-8"
-        />
+        <div className="relative w-full aspect-video mb-8 rounded-lg overflow-hidden shadow-lg">
+          <Image
+            src={article.image}
+            alt={article.title}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 800px"
+            priority
+          />
+        </div>
+
         {/* Article Content */}
         <article className="prose prose-lg dark:prose-invert max-w-none">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
